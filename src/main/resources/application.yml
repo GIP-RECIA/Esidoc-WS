@@ -17,3 +17,34 @@
 spring:
   application:
     name: ESIDOC-WS
+
+
+app:
+  ldap:
+    url:
+    base:
+    user-dn:
+    password:
+    pooled: false
+    people-root-dn:
+    anonymous-read-only: false
+    count-limit: 6000
+    timeout: 15000
+    user-uid-extractor-pattern:
+    user-opaque-id-pattern:
+    autorized-responsable-pattern:
+    filters:
+      emprunteurs:
+      parents:
+  mapping:
+    sdetbcdi:
+      NomGroupeSDET:
+        mapping: equivalentEsidoc
+        rank: 1
+      NomGroupeSDET_B:
+        mapping: equivalentEsidoc
+        rank: 2
+    sdetToIgnore:
+      - NomGroupeSDETToIgnore # parent group
+    eleve-bcdi-statut: "Elève"
+    autre-bcdi-statut: "Autre"

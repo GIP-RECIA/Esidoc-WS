@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.model;
 
-import org.springframework.stereotype.Service;
 
-public interface IExportEsidocService {
+import lombok.Data;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-    public void exportAnnuaireForUai(String uai);
+import java.util.List;
+
+@Data
+@JacksonXmlRootElement(localName = "FICHES_XML")
+public class FichesXml {
+
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty(localName = "EMPRUNTEURS")
+    private List<Emprunteurs> emprunteurs;
 }

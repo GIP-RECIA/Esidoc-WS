@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.service.bean;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-public interface IExportEsidocService {
+public interface IExtractUIDFromDN {
 
-    public void exportAnnuaireForUai(String uai);
+    String getUidFromDN(final String dn);
+
+    List<String> getUidsFromDNs(final List<String> dns);
 }

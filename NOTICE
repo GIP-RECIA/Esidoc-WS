@@ -16,7 +16,9 @@ specific language governing permissions and limitations
 under the License.
 
 This project includes:
+  Apache Commons Lang under Apache-2.0
   Apache Commons Logging under Apache-2.0
+  Apache Commons Text under Apache-2.0
   Apache Log4j API under Apache-2.0
   asm under BSD-3-Clause
   ASM based accessors helper used by json-smart under The Apache Software License, Version 2.0
@@ -24,14 +26,20 @@ This project includes:
   Awaitility under Apache 2.0
   Byte Buddy (without dependencies) under Apache License, Version 2.0
   Byte Buddy agent under Apache License, Version 2.0
+  ClassMate under Apache License, Version 2.0
   ESIDOC-WS under Apache License, Version 2.0
   Hamcrest under BSD-3-Clause
+  HdrHistogram under Public Domain, per Creative Commons CC0 or BSD-2-Clause
+  Hibernate Validator Engine under Apache License 2.0
   Jackson-annotations under The Apache Software License, Version 2.0
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
+  Jackson-dataformat-XML under The Apache Software License, Version 2.0
   Jakarta Activation API under EDL 1.0
   Jakarta Annotations API under EPL 2.0 or GPL2 w/ CPE
+  Jakarta Validation API under Apache License 2.0
   Jakarta XML Binding API under Eclipse Distribution License - v 1.0
+  JBoss Logging 3 under Apache License 2.0
   JSON library from Android SDK under Apache License 2.0
   JSON Small and Fast Parser under The Apache Software License, Version 2.0
   json-path under The Apache Software License, Version 2.0
@@ -44,10 +52,12 @@ This project includes:
   JUnit Jupiter Params under Eclipse Public License v2.0
   JUnit Platform Commons under Eclipse Public License v2.0
   JUnit Platform Engine API under Eclipse Public License v2.0
+  LatencyUtils under Public Domain, per Creative Commons CC0
   Log4j API to SLF4J Adapter under Apache-2.0
   Logback Classic Module under Eclipse Public License - v 2.0 or GNU Lesser General Public License
   Logback Core Module under Eclipse Public License - v 2.0 or GNU Lesser General Public License
   micrometer-commons under The Apache Software License, Version 2.0
+  micrometer-core under The Apache Software License, Version 2.0
   micrometer-observation under The Apache Software License, Version 2.0
   mockito-core under MIT
   mockito-junit-jupiter under MIT
@@ -62,28 +72,42 @@ This project includes:
   Spring Beans under Apache License, Version 2.0
   Spring Context under Apache License, Version 2.0
   Spring Core under Apache License, Version 2.0
+  Spring Data Core under Apache License, Version 2.0
+  Spring Data LDAP under Apache License, Version 2.0
   Spring Expression Language (SpEL) under Apache License, Version 2.0
   Spring TestContext Framework under Apache License, Version 2.0
+  Spring Transaction under Apache License, Version 2.0
   Spring Web under Apache License, Version 2.0
   Spring Web MVC under Apache License, Version 2.0
   spring-boot under Apache License, Version 2.0
   spring-boot-autoconfigure under Apache License, Version 2.0
+  spring-boot-data-commons under Apache License, Version 2.0
+  spring-boot-data-ldap under Apache License, Version 2.0
   spring-boot-http-converter under Apache License, Version 2.0
   spring-boot-jackson under Apache License, Version 2.0
+  spring-boot-ldap under Apache License, Version 2.0
+  spring-boot-persistence under Apache License, Version 2.0
   spring-boot-servlet under Apache License, Version 2.0
   spring-boot-starter under Apache License, Version 2.0
+  spring-boot-starter-data-ldap under Apache License, Version 2.0
   spring-boot-starter-jackson under Apache License, Version 2.0
   spring-boot-starter-logging under Apache License, Version 2.0
   spring-boot-starter-test under Apache License, Version 2.0
   spring-boot-starter-tomcat under Apache License, Version 2.0
   spring-boot-starter-tomcat-runtime under Apache License, Version 2.0
+  spring-boot-starter-validation under Apache License, Version 2.0
   spring-boot-starter-webmvc under Apache License, Version 2.0
   spring-boot-test under Apache License, Version 2.0
   spring-boot-test-autoconfigure under Apache License, Version 2.0
   spring-boot-tomcat under Apache License, Version 2.0
+  spring-boot-transaction under Apache License, Version 2.0
+  spring-boot-validation under Apache License, Version 2.0
   spring-boot-web-server under Apache License, Version 2.0
   spring-boot-webmvc under Apache License, Version 2.0
+  spring-ldap-core under Apache License, Version 2.0
+  Stax2 API under The BSD 2-Clause License
   tomcat-embed-core under Apache License, Version 2.0
   tomcat-embed-el under Apache License, Version 2.0
   tomcat-embed-websocket under Apache License, Version 2.0
+  Woodstox under The Apache License, Version 2.0
 

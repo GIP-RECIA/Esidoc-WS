@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.service.bean;
 
-import org.springframework.stereotype.Service;
+import org.springframework.ldap.core.DirContextAdapter;
 
-public interface IExportEsidocService {
+import javax.naming.NamingException;
 
-    public void exportAnnuaireForUai(String uai);
+public interface IExtractOpaqueId {
+
+    String getOpaqueId(final DirContextAdapter context) throws NamingException;
 }
+

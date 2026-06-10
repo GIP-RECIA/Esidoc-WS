@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.dao;
 
-import org.springframework.stereotype.Service;
+import fr.recia.esidoc.ws.model.Emprunteurs;
+import jakarta.validation.constraints.NotBlank;
 
-public interface IExportEsidocService {
+import java.util.List;
 
-    public void exportAnnuaireForUai(String uai);
+public interface ILdapDao {
+
+    List<Emprunteurs> findAllEmprunteurs(@NotBlank final String uai);
 }

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.exception;
 
-import org.springframework.stereotype.Service;
-
-public interface IExportEsidocService {
-
-    public void exportAnnuaireForUai(String uai);
+public class InvalidUAIException extends RuntimeException {
+    public InvalidUAIException(String message) {
+        super(message);
+    }
 }

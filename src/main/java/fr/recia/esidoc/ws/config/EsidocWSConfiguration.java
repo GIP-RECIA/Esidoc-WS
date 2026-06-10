@@ -15,10 +15,18 @@
  */
 package fr.recia.esidoc.ws.config;
 
+import fr.recia.esidoc.ws.config.bean.LDAPProperties;
 import fr.recia.esidoc.ws.model.RapportExport;
+import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
+import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
+import fr.recia.esidoc.ws.service.bean.impl.ExtractOpaqueIdImpl;
+import fr.recia.esidoc.ws.service.bean.impl.ExtractUIDFromDNImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.web.context.annotation.RequestScope;
 
 
@@ -27,10 +35,48 @@ import org.springframework.web.context.annotation.RequestScope;
 @Configuration
 public class EsidocWSConfiguration {
 
+    @Autowired
+    private LDAPProperties ldapProperties;
+
+    @Bean
+    public IExtractOpaqueId opaqueIdExtractor() {
+        return new ExtractOpaqueIdImpl(ldapProperties.getUserOpaqueIdPattern());
+    }
+
+
+
     @Bean
     @RequestScope
     public RapportExport rapportExport(){
         return new RapportExport();
     }
 
+    @Bean
+    public IExtractUIDFromDN uidFromDNExtractor() {
+        return new ExtractUIDFromDNImpl(ldapProperties.getUserUidExtractorPattern());
+    }
+
+    @Bean
+    public LdapContextSource contextSource() {
+        final LdapContextSource contextSource = new LdapContextSource();
+
+        contextSource.setAnonymousReadOnly(ldapProperties.isAnonymousReadOnly());
+        contextSource.setBase(ldapProperties.getBase());
+        contextSource.setUrl(ldapProperties.getUrl());
+        contextSource.setUserDn(ldapProperties.getUserDn());
+        contextSource.setPassword(ldapProperties.getPassword());
+        contextSource.setPooled(ldapProperties.isPooled());
+
+        return contextSource;
+    }
+
+    @Bean
+    public LdapTemplate ldapTemplate() throws Exception{
+        final LdapTemplate ldapTemplate = new LdapTemplate();
+        ldapTemplate.setContextSource(contextSource());
+        ldapTemplate.setDefaultCountLimit(ldapProperties.getCountLimit());
+        ldapTemplate.setDefaultTimeLimit(ldapProperties.getTimeout());
+
+        return ldapTemplate;
+    }
 }

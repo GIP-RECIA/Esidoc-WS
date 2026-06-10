@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.config.bean;
 
-import org.springframework.stereotype.Service;
+import lombok.Data;
 
-public interface IExportEsidocService {
+@Data
+public class Filters {
 
-    public void exportAnnuaireForUai(String uai);
+    String emprunteurs;
+    String parents;
+
 }
