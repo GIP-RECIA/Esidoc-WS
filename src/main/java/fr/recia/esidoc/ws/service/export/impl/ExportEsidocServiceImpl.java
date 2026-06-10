@@ -20,15 +20,22 @@ import fr.recia.esidoc.ws.dao.ILdapDao;
 import fr.recia.esidoc.ws.exception.InvalidUAIException;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.FichesXml;
+import fr.recia.esidoc.ws.model.RapportExport;
 import fr.recia.esidoc.ws.service.export.IExportEsidocService;
+import fr.recia.esidoc.ws.service.util.XmlValidatorImpl;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 import tools.jackson.databind.ObjectWriter;
 import tools.jackson.dataformat.xml.XmlMapper;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -51,10 +58,23 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 //    ServiceToken serviceToken;
 
     @Autowired
+    private RapportExport rapportExport;
+
+    @Autowired @Qualifier("importXSD")
+    private File importXSD;
+
+    private XmlValidatorImpl xmlValidator;
+
+    @PostConstruct
+    private void setUp() throws SAXException {
+        xmlValidator = new XmlValidatorImpl(importXSD);
+    }
+
+    @Autowired
     ILdapDao ldapDao;
 
 
-    public void exportAnnuaireForUai(String uai){
+    public void exportAnnuaireForUai(String uai) {
 
         checkUai(uai);
         List<Emprunteurs> emprunteursList = getEmprunteurs(uai);
@@ -71,6 +91,15 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
                         + xmlBody;
         //todo change severity to debug
         log.info(xml);
+
+        try {
+            xmlValidator.validate(xml);
+        } catch (IOException | SAXException e) {
+            rapportExport.setFailureReason(e.getMessage());
+            rapportExport.setFailure(true);
+            return;
+        }
+
     }
 
 

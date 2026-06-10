@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- Racine -->
+    <xs:element name="FICHES_XML">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="EMPRUNTEURS" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+
+                            <!-- Obligatoires NON VIDES -->
+                            <xs:element name="EMPRUNTEUR_M" type="nonEmptyString"/>
+                            <xs:element name="DATE_NAISSANCE_M" type="nonEmptyString"/>
+                            <xs:element name="ADRESSE_M" type="xs:string"/>
+                            <xs:element name="CODE_POSTAL_M" type="xs:string"/>
+                            <xs:element name="VILLE_M" type="xs:string"/>
+                            <xs:element name="TEL_M" type="xs:string"/>
+                            <xs:element name="MEL_M" type="xs:string"/>
+
+                            <xs:element name="STATUT_M_M" type="nonEmptyString"/>
+                            <xs:element name="CLASSE_M" type="xs:string" minOccurs="0"/>
+
+                            <xs:element name="COMPTE_M" type="nonEmptyString"/>
+                            <xs:element name="MOT_DE_PASSE_M" type="nonEmptyString"/>
+                            <xs:element name="IDENTITE_ENT_M" type="nonEmptyString"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Type pour empêcher les valeurs vides -->
+    <xs:simpleType name="nonEmptyString">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

@@ -25,10 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.web.context.annotation.RequestScope;
 
+import java.io.File;
+import java.io.IOException;
 
 
 @Slf4j
@@ -78,5 +81,14 @@ public class EsidocWSConfiguration {
         ldapTemplate.setDefaultTimeLimit(ldapProperties.getTimeout());
 
         return ldapTemplate;
+    }
+
+    @Bean("importXSD")
+    public File importChiffreXSD() throws IOException {
+        try {
+            return new ClassPathResource("xsd/Import.xsd").getFile();
+        } catch (Exception e) {
+            throw new IllegalStateException("Le fichier xsd/Import.xsd n'a pas été trouvé.");
+        }
     }
 }

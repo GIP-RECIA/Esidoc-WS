@@ -43,6 +43,11 @@ public class ExportEsidocController {
     @GetMapping(value = "/export/{uai}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RapportExportDTO> healthCheck(@PathVariable String uai  ) {
         exportEsidocService.exportAnnuaireForUai(uai);
+
+        if(rapportExport.isFailure()){
+            return ResponseEntity.internalServerError().body(new RapportExportDTO(rapportExport));
+        }
+
         return ResponseEntity.ok().body(new RapportExportDTO(rapportExport));
     }
 
