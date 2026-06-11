@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
@@ -112,30 +113,31 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 			final String[] parents = context.getStringAttributes(LdapAttributes.ENT_ELEVE_PERS_REL_ELEVE);
 			List<String> resp = new ArrayList<>();
 			if (parents != null) {
+
+				List<Parent> parentList = new ArrayList<>();
 				for (String parent : parents) {
-					if (responsablePattern.matcher(parent).matches()) {
-						final String parentUid = extractUIDFromDN.getUidFromDN(parent);
-						if(parentMap.containsKey(parentUid)){
-							Parent parentEntity = parentMap.get(parentUid);
-							emprunteurs.setAdresse(parentEntity.getAdresse());
-							// code postal
-							emprunteurs.setCodePostal(parentEntity.getCodePostal());
-							// ville
-							emprunteurs.setVille(parentEntity.getVille());
-							//tel
-							emprunteurs.setTel(parentEntity.getTel());
-							break;
-						}
+					final String parentUid = extractUIDFromDN.getUidFromDN(parent);
+
+					if(parentMap.containsKey(parentUid)){
+						parentList.add(parentMap.get(parentUid));
+					}else{
 						log.warn("Parent {} of Elève {} not found in parent map", parentUid, uid);
 					}
 				}
-				log.warn("No parent of Elève {} found in parent map", uid);
+
+			    Optional<Parent> optionalParent = parentList.stream().filter(x -> !isNullOrEmpty(x.getTel())).findFirst();
+				Parent parentEntity = optionalParent.orElseGet(parentList::getFirst);
+					// adresse
+					emprunteurs.setAdresse(parentEntity.getAdresse());
+					// code postal
+					emprunteurs.setCodePostal(parentEntity.getCodePostal());
+					// ville
+					emprunteurs.setVille(parentEntity.getVille());
+					//tel
+					emprunteurs.setTel(parentEntity.getTel());
 			}else{
 				log.warn("Elève {} doesn't have any parent", uid);
 			}
-
-
-
 		}else{
 			// sinon on récupere direct
 
