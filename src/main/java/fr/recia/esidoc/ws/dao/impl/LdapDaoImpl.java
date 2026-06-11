@@ -82,7 +82,7 @@ public class LdapDaoImpl implements ILdapDao {
         log.debug("LDAP filter applied : " + filter);
         ContextMapper<Map.Entry<String, Parent>> mapper = new ParentsAttributesMapper();
         LdapQuery query = LdapQueryBuilder.query()
-                .attributes(LdapAttributes.PERSON_ATTRS.toArray(new String[LdapAttributes.PERSON_ATTRS.size()]))
+            .attributes(LdapAttributes.PARENT_ATTRS.toArray(new String[LdapAttributes.PARENT_ATTRS.size()]))
                 .base(ldapProperties.getPeopleRootDn()).filter(filter);
 
         parentMap =

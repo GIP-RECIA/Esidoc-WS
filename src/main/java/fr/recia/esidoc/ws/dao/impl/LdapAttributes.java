@@ -49,4 +49,7 @@ public class LdapAttributes {
     public static final Set<String> PERSON_ATTRS =
             Stream.of(UID, SN, GIVEN_NAME, PERSONAL_TITLE, ENT_PERSON_CODE_POSTAL, ENT_PERSON_VILLE, ENT_PERSON_ADRESSE, ENT_PERSON_DATE_NAISSANCE, ENT_PERSON_PAYS, ENT_ELEVE_PERS_REL_ELEVE, ESCO_PERSON_EXTERNAL_IDS, ENT_PERSON_PROFILS, MAIL, ENT_PERSON_MOBILE_SMS, ENT_ELEVE_CLASSES)
                     .collect(Collectors.toSet());
+
+    public static Set<String> PARENT_ATTRS =
+            Stream.of(ENT_PERSON_ADRESSE, ENT_PERSON_CODE_POSTAL, ENT_PERSON_VILLE, ENT_PERSON_MOBILE_SMS, UID).collect(Collectors.toSet());
 }
