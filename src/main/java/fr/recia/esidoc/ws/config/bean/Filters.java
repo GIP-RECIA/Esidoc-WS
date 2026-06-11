@@ -22,5 +22,6 @@ public class Filters {
 
     String emprunteurs;
     String parents;
+    String validUai;
 
 }

@@ -29,6 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.Filter;
@@ -93,6 +94,17 @@ public class LdapDaoImpl implements ILdapDao {
                         ));
 
 //        return map;
+    }
+
+    @Override
+    public boolean isValidUai(String uai) {
+        final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getValidUai(), uai));
+        LdapQuery query = LdapQueryBuilder.query().countLimit(1)
+                .base(ldapProperties.getStructureRootDn()).filter(filter);
+        return !ldapTemplate.search(
+                query,
+                (AttributesMapper<Void>) attrs -> null
+        ).isEmpty();
     }
 
     @Override

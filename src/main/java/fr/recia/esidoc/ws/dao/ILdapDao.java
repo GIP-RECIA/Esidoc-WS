@@ -22,5 +22,7 @@ import java.util.List;
 
 public interface ILdapDao {
 
+    boolean isValidUai(@NotBlank final String uai);
+
     List<Emprunteurs> findAllEmprunteurs(@NotBlank final String uai);
 }

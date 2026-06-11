@@ -104,15 +104,9 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
 
     private void checkUai(String uai){
-
-        //todo interrogation LDAP
-
-        //todo change condition when LDAP interrogation is implemented
-        if(false){
+        if(!ldapDao.isValidUai(uai)){
             throw new InvalidUAIException(String.format("Could not found strucuture with UAI %s in LDAP", uai));
         }
-
-
     }
 
 

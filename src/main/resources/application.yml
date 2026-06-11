@@ -27,6 +27,7 @@ app:
     password:
     pooled: false
     people-root-dn:
+    structure-root-dn:
     anonymous-read-only: false
     count-limit: 6000
     timeout: 15000
@@ -36,6 +37,7 @@ app:
     filters:
       emprunteurs:
       parents:
+      valid-uai:
   mapping:
     sdetbcdi:
       NomGroupeSDET:

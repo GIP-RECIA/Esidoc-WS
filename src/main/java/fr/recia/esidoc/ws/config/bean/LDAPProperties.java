@@ -47,6 +47,8 @@ public class LDAPProperties {
 
     String peopleRootDn;
 
+    String structureRootDn;
+
     String  userUidExtractorPattern;
 
     String autorizedResponsablePattern;
