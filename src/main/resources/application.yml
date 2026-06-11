@@ -19,6 +19,15 @@ spring:
     name: ESIDOC-WS
 
 
+  security:
+    oauth2:
+      client:
+        registration:
+          authorization-grant-type: ""
+          client-id: ""
+          client-secret: ""
+          oauth2TokenUri: ""
+
 app:
   ldap:
     url:
@@ -50,3 +59,7 @@ app:
       - NomGroupeSDETToIgnore # parent group
     eleve-bcdi-statut: "Elève"
     autre-bcdi-statut: "Autre"
+  esidoc:
+    editeur: "editeur"
+    export-annuaire-uri: "placeholder/${app.esidoc.editeur}/{rne}"
+    rne-dev-qualif: ""
