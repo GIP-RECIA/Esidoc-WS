@@ -159,6 +159,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             if(response.hasBody()){
                 log.trace("Received response from API : {}", response.getBody());
+                rapportExport.setEsidocApiResponse(response.getBody());
             }
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -175,6 +176,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
         }
         catch (HttpStatusCodeException e){
            rapportExport.setFailure(true);
+           rapportExport.setEsidocApiResponse(e.getResponseBodyAsString());
            rapportExport.setFailureReason(String.format("Encountered error %s during POST request to %s", e.getStatusCode(), url));
         }
         catch (RestClientException e) {

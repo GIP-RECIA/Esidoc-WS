@@ -28,6 +28,7 @@ public class RapportExport {
 
     boolean failure;
     String failureReason;
+    String esidocApiResponse = "Failed before getting esidoc api response";
 
 
 }

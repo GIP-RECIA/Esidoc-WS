@@ -35,12 +35,14 @@ public class RapportExportDTO {
         this.warnings = rapportExport.getWarnings();
         this.failure = rapportExport.isFailure();
         this.failureReason = rapportExport.getFailureReason();
+        this.esidocApiResponse = rapportExport.getEsidocApiResponse();
     }
 
     List<String> warnings = new ArrayList<>();
 
     boolean failure;
     String failureReason;
+    String esidocApiResponse;
 
 
 }
