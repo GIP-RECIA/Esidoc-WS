@@ -192,13 +192,10 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
             Assert.hasText(emprunteurs.getMotDePasse(), "MOT_DE_PASSE_M (motDePass) should not be null or blank");
             Assert.hasText(emprunteurs.getIdentiteEnt(), "IDENTITE_ENT_M (identiteEnt (External ID)) should not be null or blank");
         } catch (Exception e) {
-
-			log.info("status is {}", statusToUse);
 			if(mappingProperties.getAutreBcdiStatut().equals(statusToUse)){
 				rapportExport.getWarnings().add(String.format("Skipped user with uid %s since STATUT_M_M is Autre and this population is not required", uid));
 				return null;
 			}
-
             throw new RuntimeException(e);
         }
 
