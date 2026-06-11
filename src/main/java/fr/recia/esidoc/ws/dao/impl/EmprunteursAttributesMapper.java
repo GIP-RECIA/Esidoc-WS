@@ -116,28 +116,22 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 					if (responsablePattern.matcher(parent).matches()) {
 						final String parentUid = extractUIDFromDN.getUidFromDN(parent);
 						if(parentMap.containsKey(parentUid)){
-
 							Parent parentEntity = parentMap.get(parentUid);
 							emprunteurs.setAdresse(parentEntity.getAdresse());
-
 							// code postal
 							emprunteurs.setCodePostal(parentEntity.getCodePostal());
-
 							// ville
 							emprunteurs.setVille(parentEntity.getVille());
-
-
-							//todo tel
+							//tel
 							emprunteurs.setTel(parentEntity.getTel());
-
-
 							break;
 						}
+						log.warn("Parent {} of Elève {} not found in parent map", parentUid, uid);
 					}
-					log.error("TUT not having adresse");
 				}
+				log.warn("No parent of Elève {} found in parent map", uid);
 			}else{
-				log.error("ELV without TUT");
+				log.warn("Elève {} doesn't have any parent", uid);
 			}
 
 
