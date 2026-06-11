@@ -33,9 +33,6 @@ public class MappingProperties {
 
     private Map<String, MappingRanked> sdetbcdi;
 
-    // people who only have some specifics status must not be sent to esidoc, they must be ignored in order to not fallback as "other"
-    private List<String> sdetToIgnore;
-
     String eleveBcdiStatut;
 
     String autreBcdiStatut;
@@ -44,7 +41,6 @@ public class MappingProperties {
     public String toString() {
         return "MappingProperties{" +
                 "sdetbcdi=" + sdetbcdi +
-                ", sdetToIgnore=" + sdetToIgnore +
                 ", eleveBcdiStatut='" + eleveBcdiStatut + '\'' +
                 ", autreBcdiStatut='" + autreBcdiStatut + '\'' +
                 '}';

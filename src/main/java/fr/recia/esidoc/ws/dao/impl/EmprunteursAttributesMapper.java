@@ -98,10 +98,6 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 
 		String statusToUse = mappingStatusUtils.getMainStatusMM(List.of(context.getStringAttributes(LdapAttributes.ENT_PERSON_PROFILS)));
 
-		if(Objects.isNull(statusToUse)){
-			return null;
-		}
-
 		// STATUS
 		emprunteurs.setStatut(statusToUse);
 

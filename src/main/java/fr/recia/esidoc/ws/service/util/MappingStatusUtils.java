@@ -34,8 +34,6 @@ public class MappingStatusUtils {
     @Nullable
     public String getMainStatusMM(List<String> statusSdetList){
         statusSdetList = new ArrayList<>(statusSdetList);
-        // remove all status that must not be exported to bcdi
-        statusSdetList.removeAll(mappingProperties.getSdetToIgnore());
         if(statusSdetList.isEmpty()){
             return null;
         }
