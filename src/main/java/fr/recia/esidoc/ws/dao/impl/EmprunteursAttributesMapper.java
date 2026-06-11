@@ -121,7 +121,9 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 					if(parentMap.containsKey(parentUid)){
 						parentList.add(parentMap.get(parentUid));
 					}else{
-						log.warn("Parent {} of Elève {} not found in parent map", parentUid, uid);
+						String message = String.format("Parent %s of Elève %s not found in parent map", parentUid, uid);
+						rapportExport.getWarnings().add(message);
+						log.warn(message);
 					}
 				}
 
@@ -136,7 +138,9 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 					//tel
 					emprunteurs.setTel(parentEntity.getTel());
 			}else{
-				log.warn("Elève {} doesn't have any parent", uid);
+				String message = String.format("Elève %s doesn't have any parent", uid);
+				rapportExport.getWarnings().add(message);
+				log.warn(message);
 			}
 		}else{
 			// sinon on récupere direct
