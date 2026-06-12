@@ -14,7 +14,7 @@
     <packaging>war</packaging>
     <name>ESIDOC-WS</name>
     <inceptionYear>2026</inceptionYear>
-    <description>ESIDOC-WS</description>
+    <description>Application REST Web-service permettant de transmettre un export de l'annuaire ENT à Esidoc</description>
     <url/>
     <licenses>
         <license/>
