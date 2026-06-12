@@ -17,7 +17,7 @@ package fr.recia.esidoc.ws.web.rest;
 
 import fr.recia.esidoc.ws.dto.RapportExportDTO;
 import fr.recia.esidoc.ws.model.RapportExport;
-import fr.recia.esidoc.ws.service.export.IExportEsidocService;
+import fr.recia.esidoc.ws.service.IExportEsidocService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

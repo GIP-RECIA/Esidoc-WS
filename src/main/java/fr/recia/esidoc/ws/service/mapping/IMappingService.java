@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service.export;
+package fr.recia.esidoc.ws.service.mapping;
 
-import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 
-public interface IExportEsidocService {
+import java.io.IOException;
 
-    public void exportAnnuaireForUai(String uai);
+public interface IMappingService {
+    public String getValidatedXmlForUai(String uai) throws IOException, SAXException;
 }
