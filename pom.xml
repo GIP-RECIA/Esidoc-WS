@@ -158,7 +158,12 @@
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <packagingExcludes>**/application-*.yml</packagingExcludes>
+                    <packagingExcludes>
+                        **/application-*.yml,
+                        **/*Test.class,</packagingExcludes>
+                    <warSourceExcludes>src/,
+                        public/,
+                        tests/</warSourceExcludes>
                     <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
