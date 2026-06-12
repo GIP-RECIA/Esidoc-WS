@@ -18,6 +18,7 @@ package fr.recia.esidoc.ws.service.export.impl;
 
 import fr.recia.esidoc.ws.config.bean.EsidocProperties;
 import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
+import fr.recia.esidoc.ws.model.EsidocError;
 import fr.recia.esidoc.ws.model.RapportExport;
 import fr.recia.esidoc.ws.service.auth.token.ServiceToken;
 import fr.recia.esidoc.ws.service.export.IExportService;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -78,6 +80,10 @@ public class ExportServiceImpl implements IExportService {
             rapportExport.setFailureReason(String.format("Encountered error %s during POST request to %s", e.getMessage(), url));
         }
         catch (HttpStatusCodeException e){
+            if(e.getStatusCode().equals(HttpStatus.BAD_REQUEST)){
+                log.error("Esidoc error : {}",  e.getResponseBodyAs(EsidocError.class));
+            }
+
            rapportExport.setFailure(true);
            rapportExport.setEsidocApiResponse(e.getResponseBodyAsString());
            rapportExport.setFailureReason(String.format("Encountered error %s during POST request to %s", e.getStatusCode(), url));
