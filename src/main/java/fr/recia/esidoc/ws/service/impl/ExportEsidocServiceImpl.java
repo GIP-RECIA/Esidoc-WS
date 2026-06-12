@@ -18,7 +18,7 @@ package fr.recia.esidoc.ws.service.impl;
 import fr.recia.esidoc.ws.config.bean.EsidocProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
 import fr.recia.esidoc.ws.exception.InvalidUAIException;
-import fr.recia.esidoc.ws.model.RapportExport;
+import fr.recia.esidoc.ws.exception.MappingValidationException;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
 import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
@@ -44,9 +44,6 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
     private Environment environment;
 
     @Autowired
-    private RapportExport rapportExport;
-
-    @Autowired
     ILdapDao ldapDao;
 
     @Autowired
@@ -56,20 +53,18 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
     IMappingService mappingService;
 
 
-    public void exportAnnuaireForUai(String uai) {
+    public String exportAnnuaireForUai(String uai) {
         checkUai(uai);
         String xml = null;
         try {
             xml = mappingService.getValidatedXmlForUai(uai);
         } catch (IOException | SAXException e) {
-            rapportExport.setFailureReason(e.getMessage());
-            rapportExport.setFailure(true);
-            return;
+            throw new MappingValidationException("Error when trying to validate XML for " +uai);
         }
         String uaiToExport = environment.acceptsProfiles(Profiles.of("local","dev","test","ci"))
                 ? esidocProperties.getRneDevQualif()
                 : uai;
-        exportService.exportMappingToUai(uaiToExport, xml);
+        return exportService.exportMappingToUai(uaiToExport, xml);
     }
 
 

@@ -19,7 +19,6 @@ package fr.recia.esidoc.ws.service.export.impl;
 import fr.recia.esidoc.ws.config.bean.EsidocProperties;
 import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
 import fr.recia.esidoc.ws.model.EsidocError;
-import fr.recia.esidoc.ws.model.RapportExport;
 import fr.recia.esidoc.ws.service.auth.token.ServiceToken;
 import fr.recia.esidoc.ws.service.export.IExportService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,11 +52,8 @@ public class ExportServiceImpl implements IExportService {
     @Autowired
     ServiceToken serviceToken;
 
-    @Autowired
-    private RapportExport rapportExport;
-
     @Override
-    public void exportMappingToUai(String uai, String xml){
+    public String exportMappingToUai(String uai, String xml){
         log.info("xml variable in export method {}", xml);
         String url = esidocProperties.getExportAnnuaireUri().replace(RNE_SLUG, uai);
         try {
@@ -70,23 +66,19 @@ public class ExportServiceImpl implements IExportService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             if(response.hasBody()){
                 log.trace("Received response from API : {}", response.getBody());
-                rapportExport.setEsidocApiResponse(response.getBody());
             }
-            assert response.getBody() != null;
+            return response.getBody();
         } catch ( HttpMessageNotReadableException e) {
-               log.error("An exception occured when trying to send XML to Esidoc", e);
-            rapportExport.setFailure(true);
-            rapportExport.setEsidocApiResponse(e.getMessage());
-            rapportExport.setFailureReason(String.format("Encountered error %s during POST request to %s", e.getMessage(), url));
+           log.error("An exception occured when trying to send XML to {}", url, e);
+            throw new ExportAnnuaireException(e.getMessage());
         }
         catch (HttpStatusCodeException e){
             if(e.getStatusCode().equals(HttpStatus.BAD_REQUEST)){
-                log.error("Esidoc error : {}",  e.getResponseBodyAs(EsidocError.class));
+                log.error("Esidoc error {} during post request to {}",  e.getResponseBodyAs(EsidocError.class), url, e);
+            }else{
+                log.error("Encountered error {} during POST request to {}", e.getStatusCode(), url, e);
             }
-
-           rapportExport.setFailure(true);
-           rapportExport.setEsidocApiResponse(e.getResponseBodyAsString());
-           rapportExport.setFailureReason(String.format("Encountered error %s during POST request to %s", e.getStatusCode(), url));
+            throw new ExportAnnuaireException(e.getMessage());
         }
         catch (RestClientException e) {
             throw new ExportAnnuaireException(e.getMessage());

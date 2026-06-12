@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.model;
+package fr.recia.esidoc.ws.exception;
 
-import lombok.Data;
-import org.springframework.web.context.annotation.RequestScope;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Data
-public class RapportExport {
-
-    List<String> warnings = new ArrayList<>();
-
-    boolean failure;
-    String failureReason;
-    String esidocApiResponse = "Failed before getting esidoc api response";
-
-
+public class MappingValidationException extends RuntimeException {
+    public MappingValidationException(String message) {
+        super(message);
+    }
 }

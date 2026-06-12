@@ -16,5 +16,5 @@
 package fr.recia.esidoc.ws.service.export;
 
 public interface IExportService {
-    public void exportMappingToUai(String uai, String xml);
+    public String exportMappingToUai(String uai, String xml);
 }

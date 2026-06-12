@@ -22,13 +22,11 @@ package fr.recia.esidoc.ws.dao.impl;
 import fr.recia.esidoc.ws.config.bean.MappingProperties;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.Parent;
-import fr.recia.esidoc.ws.model.RapportExport;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
 import fr.recia.esidoc.ws.service.util.MappingStatusUtils;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +37,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.naming.NamingException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,8 +68,6 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 
 	@NotNull
 	private Pattern responsablePattern;
-
-	private RapportExport rapportExport;
 
 	@Override
 	public Emprunteurs mapFromContext(Object ctx) throws NamingException {
@@ -122,7 +116,7 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 						parentList.add(parentMap.get(parentUid));
 					}else{
 						String message = String.format("Parent %s of Elève %s not found in parent map", parentUid, uid);
-						rapportExport.getWarnings().add(message);
+						log.info(message);
 						log.warn(message);
 					}
 				}
@@ -139,7 +133,7 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 					emprunteurs.setTel(parentEntity.getTel());
 			}else{
 				String message = String.format("Elève %s doesn't have any parent", uid);
-				rapportExport.getWarnings().add(message);
+				log.info(message);
 				log.warn(message);
 			}
 		}else{
@@ -197,7 +191,7 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
             Assert.hasText(emprunteurs.getIdentiteEnt(), "IDENTITE_ENT_M (identiteEnt (External ID)) should not be null or blank");
         } catch (Exception e) {
 			if(mappingProperties.getAutreBcdiStatut().equals(statusToUse)){
-				rapportExport.getWarnings().add(String.format("Skipped user with uid %s since STATUT_M_M is Autre and this population is not required", uid));
+				log.info(String.format("Skipped user with uid %s since STATUT_M_M is Autre and this population is not required", uid));
 				return null;
 			}
             throw new RuntimeException(e);
@@ -207,34 +201,34 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
         // classe non obligatoire mais devrait etre rempli si eleve
 		if(eleveStatus.equals(emprunteurs.getStatut())){
 			if(isNullOrEmpty(emprunteurs.getClasse())){
-				rapportExport.getWarnings().add(String.format("No CLASSE_M  for person with uid %s and statut %s", uid, statusToUse));
+				log.info(String.format("No CLASSE_M  for person with uid %s and statut %s", uid, statusToUse));
 			}
 		}
 
 		//adresse cide postal ville tel mel
 
 		if(isNullOrEmpty(emprunteurs.getAdresse())){
-			rapportExport.getWarnings().add(String.format("No ADRESSE_M for person with uid %s and statut %s", uid, statusToUse));
+			log.info(String.format("No ADRESSE_M for person with uid %s and statut %s", uid, statusToUse));
 			emprunteurs.setAdresse("");
 		}
 
 		if(isNullOrEmpty(emprunteurs.getCodePostal())){
-			rapportExport.getWarnings().add(String.format("No CODE_POSTAL_M for person with uid %s and statut %s", uid, statusToUse));
+			log.info(String.format("No CODE_POSTAL_M for person with uid %s and statut %s", uid, statusToUse));
 			emprunteurs.setCodePostal("");
 		}
 
 		if(isNullOrEmpty(emprunteurs.getVille())){
-			rapportExport.getWarnings().add(String.format("No VILLE_M for person with uid %s and statut %s", uid, statusToUse));
+			log.info(String.format("No VILLE_M for person with uid %s and statut %s", uid, statusToUse));
 			emprunteurs.setVille("");
 		}
 
 		if(isNullOrEmpty(emprunteurs.getTel())){
-			rapportExport.getWarnings().add(String.format("No TEL_M for person with uid %s and statut %s", uid, statusToUse));
+			log.info(String.format("No TEL_M for person with uid %s and statut %s", uid, statusToUse));
 			emprunteurs.setTel("");
 		}
 
 		if(isNullOrEmpty(emprunteurs.getMail())){
-			rapportExport.getWarnings().add(String.format("No MEL_M for person with uid %s and statut %s", uid, statusToUse));
+			log.info(String.format("No MEL_M for person with uid %s and statut %s", uid, statusToUse));
 			emprunteurs.setMail("");
 		}
 

@@ -20,7 +20,6 @@ import fr.recia.esidoc.ws.config.bean.MappingProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.Parent;
-import fr.recia.esidoc.ws.model.RapportExport;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
 import fr.recia.esidoc.ws.service.util.MappingStatusUtils;
@@ -73,10 +72,6 @@ public class LdapDaoImpl implements ILdapDao {
     @Autowired
     private IExtractUIDFromDN extractUIDFromDN;
 
-    @Autowired
-    RapportExport rapportExport;
-
-
      private void findAllparents(String uai) {
         final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getParents(), uai));
         log.debug("LDAP filter applied : " + filter);
@@ -119,8 +114,7 @@ public class LdapDaoImpl implements ILdapDao {
                 mappingProperties,
                 parentMap,
                 extractUIDFromDN,
-                Pattern.compile(ldapProperties.getAutorizedResponsablePattern()),
-                rapportExport
+                Pattern.compile(ldapProperties.getAutorizedResponsablePattern())
         );
         LdapQuery query = LdapQueryBuilder.query()
                 .attributes(LdapAttributes.PERSON_ATTRS.toArray(new String[LdapAttributes.PERSON_ATTRS.size()]))

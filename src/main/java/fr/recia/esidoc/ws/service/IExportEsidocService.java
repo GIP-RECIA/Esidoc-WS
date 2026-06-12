@@ -18,6 +18,6 @@ package fr.recia.esidoc.ws.service;
 
 public interface IExportEsidocService {
 
-    public void exportAnnuaireForUai(String uai);
+    public String exportAnnuaireForUai(String uai);
 
 }

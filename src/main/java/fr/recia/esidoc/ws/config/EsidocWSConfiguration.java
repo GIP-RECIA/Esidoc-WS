@@ -16,7 +16,6 @@
 package fr.recia.esidoc.ws.config;
 
 import fr.recia.esidoc.ws.config.bean.LDAPProperties;
-import fr.recia.esidoc.ws.model.RapportExport;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
 import fr.recia.esidoc.ws.service.bean.impl.ExtractOpaqueIdImpl;
@@ -44,14 +43,6 @@ public class EsidocWSConfiguration {
     @Bean
     public IExtractOpaqueId opaqueIdExtractor() {
         return new ExtractOpaqueIdImpl(ldapProperties.getUserOpaqueIdPattern());
-    }
-
-
-
-    @Bean
-    @RequestScope
-    public RapportExport rapportExport(){
-        return new RapportExport();
     }
 
     @Bean
