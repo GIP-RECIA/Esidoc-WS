@@ -63,3 +63,7 @@ app:
     editeur: "editeur"
     export-annuaire-uri: "placeholder/${app.esidoc.editeur}/{rne}"
     rne-dev-qualif: ""
+  conf:
+    structures-regroupees:
+#      "placeholderA":
+#        - placeholderB

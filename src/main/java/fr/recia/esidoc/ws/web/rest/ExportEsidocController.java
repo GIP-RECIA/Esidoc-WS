@@ -15,6 +15,7 @@
  */
 package fr.recia.esidoc.ws.web.rest;
 
+import fr.recia.esidoc.ws.dto.ExportEsidocResponse;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,8 @@ public class ExportEsidocController {
     IExportEsidocService exportEsidocService;
 
     @GetMapping(value = "/export/{uai}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> healthCheck(@PathVariable String uai  ) {
-        String responseEsidoc = exportEsidocService.exportAnnuaireForUai(uai);
+    public ResponseEntity<ExportEsidocResponse> healthCheck(@PathVariable String uai  ) {
+        ExportEsidocResponse responseEsidoc = new ExportEsidocResponse(exportEsidocService.exportAnnuaireForUai(uai));
         return ResponseEntity.ok().body(responseEsidoc);
     }
 

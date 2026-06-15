@@ -16,8 +16,10 @@
 package fr.recia.esidoc.ws.service;
 
 
+import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
+
 public interface IExportEsidocService {
 
-    public String exportAnnuaireForUai(String uai);
+    public String exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException;
 
 }

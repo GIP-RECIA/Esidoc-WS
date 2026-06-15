@@ -15,8 +15,11 @@
  */
 package fr.recia.esidoc.ws.service.impl;
 
+import fr.recia.esidoc.ws.config.bean.ConfProperties;
 import fr.recia.esidoc.ws.config.bean.EsidocProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
+import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
+import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.InvalidUAIException;
 import fr.recia.esidoc.ws.exception.MappingValidationException;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
@@ -31,6 +34,8 @@ import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -52,19 +57,66 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
     @Autowired
     IMappingService mappingService;
 
+    @Autowired
+    ConfProperties confProperties;
 
-    public String exportAnnuaireForUai(String uai) {
-        checkUai(uai);
-        String xml = null;
-        try {
-            xml = mappingService.getValidatedXmlForUai(uai);
-        } catch (IOException | SAXException e) {
-            throw new MappingValidationException("Error when trying to validate XML for " +uai);
+
+    private List<String> getUaiRegroupees(String uai){
+
+        List<String> uais = new ArrayList<>(List.of(uai));
+
+        if(confProperties.getStructuresRegroupees().containsKey(uai)){
+            uais.addAll(confProperties.getStructuresRegroupees().get(uai));
         }
-        String uaiToExport = environment.acceptsProfiles(Profiles.of("local","dev","test","ci"))
-                ? esidocProperties.getRneDevQualif()
-                : uai;
-        return exportService.exportMappingToUai(uaiToExport, xml);
+
+        for(String uaiIterated: uais){
+            checkUai(uaiIterated);
+        }
+        return uais;
+    }
+
+    public String exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException {
+
+        List<String> uais = getUaiRegroupees(uai);
+
+        List<String> responses = new ArrayList<>();
+
+        List<String> exceptionUais = new ArrayList<>();
+
+        for(String uaiIterated : uais){
+            // try catch in the for so exceptions for some uai does not prevent other to be exported
+            try {
+                String xml;
+                try {
+                    xml = mappingService.getValidatedXmlForUai(uai);
+                } catch (IOException | SAXException e) {
+                    throw new MappingValidationException("Error when trying to validate XML for " +uai);
+                }
+                String uaiToExport = environment.acceptsProfiles(Profiles.of("local","dev","test","ci"))
+                        ? esidocProperties.getRneDevQualif()
+                        : uaiIterated;
+                responses.add(exportService.exportMappingToUai(uaiToExport, xml));
+            }
+            catch (Exception e) {
+                if (e instanceof MappingValidationException) {
+                    log.error("Mapping exception when trying to export to {}", uaiIterated, e);
+                } else if (e instanceof ExportAnnuaireException) {
+                    log.error("Export exception when trying to export to {}", uaiIterated, e);
+                } else {
+                    log.error("Unexpected exception", e);
+                }
+               exceptionUais.add(uaiIterated);
+            }
+        }
+
+        String successfulJoined = String.join(System.lineSeparator()+System.lineSeparator(), responses);
+
+        // if there is at least one uai that thrown, throw an exception
+        if(!exceptionUais.isEmpty()){
+            throw new GlobalExportAnnuaireException("Exception occured during export", exceptionUais, exceptionUais.size() != uais.size(), successfulJoined);
+        }
+
+        return successfulJoined;
     }
 
 
