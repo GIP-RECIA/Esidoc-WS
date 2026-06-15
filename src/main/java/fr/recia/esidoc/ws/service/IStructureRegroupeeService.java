@@ -13,28 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.config.bean;
+package fr.recia.esidoc.ws.service;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.ArrayList;
 import java.util.List;
 
-@ConfigurationProperties(prefix = "app.conf")
-@Data
-@Validated
-@Slf4j
-public class ConfProperties {
+public interface IStructureRegroupeeService {
 
-   List<List<String>> structuresRegroupees = new ArrayList<>();
+    public List<String> getUaisRegroupement(String uai);
 
-    @Override
-    public String toString() {
-        return "ConfProperties{" +
-                "structuresRegroupees=" + structuresRegroupees +
-                '}';
-    }
 }

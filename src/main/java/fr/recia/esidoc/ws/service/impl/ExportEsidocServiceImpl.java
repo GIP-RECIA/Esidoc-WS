@@ -23,6 +23,7 @@ import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.InvalidUAIException;
 import fr.recia.esidoc.ws.exception.MappingValidationException;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
+import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
 import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
 import lombok.extern.slf4j.Slf4j;
@@ -60,24 +61,13 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
     @Autowired
     ConfProperties confProperties;
 
+    @Autowired
+    IStructureRegroupeeService structureRegroupeeService;
 
-    private List<String> getUaiRegroupees(String uai){
-
-        List<String> uais = new ArrayList<>(List.of(uai));
-
-        if(confProperties.getStructuresRegroupees().containsKey(uai)){
-            uais.addAll(confProperties.getStructuresRegroupees().get(uai));
-        }
-
-        for(String uaiIterated: uais){
-            checkUai(uaiIterated);
-        }
-        return uais;
-    }
 
     public String exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException {
 
-        List<String> uais = getUaiRegroupees(uai);
+        List<String> uais = structureRegroupeeService.getUaisRegroupement(uai);
 
         List<String> responses = new ArrayList<>();
 
