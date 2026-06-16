@@ -67,3 +67,10 @@ app:
     structures-regroupees:
 #      - - "placeholderA"
 #        - "placeholderB"
+  debug:
+    debug-mode: none # none, profiles
+    debug-uai: "*********"
+    profiles:
+#      - local
+#      - dev
+#      - ci

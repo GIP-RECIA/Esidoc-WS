@@ -28,7 +28,6 @@ public class EsidocProperties {
 
    String editeur;
    String exportAnnuaireUri;
-   String rneDevQualif;
 
     @PostConstruct
     void init(){
@@ -40,7 +39,6 @@ public class EsidocProperties {
         return "EsidocProperties{" +
                 "editeur='" + editeur + '\'' +
                 ", exportAnnuaireUri='" + exportAnnuaireUri + '\'' +
-                ", rneDevQualif='" + rneDevQualif + '\'' +
                 '}';
     }
 }

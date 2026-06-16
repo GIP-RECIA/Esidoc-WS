@@ -15,6 +15,7 @@
  */
 package fr.recia.esidoc.ws.config;
 
+import fr.recia.esidoc.ws.config.bean.DebugProperties;
 import fr.recia.esidoc.ws.config.bean.LDAPProperties;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
@@ -24,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
@@ -31,6 +34,7 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Function;
 
 
 @Slf4j
@@ -39,6 +43,40 @@ public class EsidocWSConfiguration {
 
     @Autowired
     private LDAPProperties ldapProperties;
+
+    @Autowired
+    private DebugProperties debugProperties;
+
+    @Autowired
+    private Environment environment;
+
+
+    @Bean(name = "uaiToUseSelector")
+    public Function<String, String> uaiToUseSelector(){
+        switch (debugProperties.getDebugMode()){
+            case PROFILES -> {
+                Profiles profiles = Profiles.of(
+                    String.join(" | ", debugProperties.getProfiles())
+                );
+                boolean profilesMatch = environment.acceptsProfiles(profiles);
+                //if true return debug value, if false return true value;
+                if(profilesMatch){
+                    log.debug("uaiToUseSelector returned is _ -> debugProperties.getDebugUai()");
+                    return _ -> debugProperties.getDebugUai();
+                }else{
+                    log.debug("uaiToUseSelector returned is x -> x");
+                    return x -> x;
+                }
+            }
+            // also none
+            case null, default -> {
+                log.debug("uaiToUseSelector returned is x -> x");
+                return x -> x;
+            }
+
+        }
+    }
+
 
     @Bean
     public IExtractOpaqueId opaqueIdExtractor() {

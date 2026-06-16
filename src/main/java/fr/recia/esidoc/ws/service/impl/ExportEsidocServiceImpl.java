@@ -28,6 +28,7 @@ import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 
@@ -37,11 +38,16 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 @Slf4j
 @Service
 public class ExportEsidocServiceImpl implements IExportEsidocService {
 
+
+    @Autowired
+    @Qualifier("uaiToUseSelector")
+    Function<String, String> uaiToUseSelector;
 
     @Autowired
     EsidocProperties esidocProperties;
@@ -82,9 +88,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
                 } catch (IOException | SAXException e) {
                     throw new MappingValidationException("Error when trying to validate XML for " +uai);
                 }
-                String uaiToExport = environment.acceptsProfiles(Profiles.of("local","dev","test","ci"))
-                        ? esidocProperties.getRneDevQualif()
-                        : uaiIterated;
+                String uaiToExport = uaiToUseSelector.apply(uaiIterated);
                 responses.add(exportService.exportMappingToUai(uaiToExport, xml));
             }
             catch (Exception e) {
