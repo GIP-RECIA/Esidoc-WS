@@ -24,7 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 
@@ -33,10 +32,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(GlobalExportAnnuaireException.class)
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     ResponseEntity<ExportEsidocResponse> handleGlobalExportAnnuaireException(HttpServletRequest request, Throwable ex) {
         final GlobalExportAnnuaireException e = (GlobalExportAnnuaireException) ex;
-        return ResponseEntity.internalServerError().contentType(MediaType.APPLICATION_JSON).body(new ExportEsidocResponse(e));
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).contentType(MediaType.APPLICATION_JSON).body(new ExportEsidocResponse(e));
     }
-
 }
