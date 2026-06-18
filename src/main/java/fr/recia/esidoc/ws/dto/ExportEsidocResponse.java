@@ -29,12 +29,12 @@ public class ExportEsidocResponse extends ExportEsidocPositiveResponse {
     List<String> alreadyExportedUais;
 
 
-    public ExportEsidocResponse(String responseFromEsidocApi){
+    public ExportEsidocResponse(List<String> responseFromEsidocApi){
         super(responseFromEsidocApi);
     }
 
     public ExportEsidocResponse(GlobalExportAnnuaireException globalExportAnnuaireException){
-        super(globalExportAnnuaireException.getResponseMessage());
+        super(globalExportAnnuaireException.getSuccessfulUais());
         this.exceptionUais = new ArrayList<>(globalExportAnnuaireException.getExceptionUais());
         this.success = globalExportAnnuaireException.isPartial() ? "partial" : "fail";
         this.alreadyExportedUais = globalExportAnnuaireException.getAlreadyExportedUais();
@@ -42,11 +42,13 @@ public class ExportEsidocResponse extends ExportEsidocPositiveResponse {
 
 
     public ExportEsidocResponse(ExportEsidocPositiveResponse exportEsidocPositiveResponse){
-        super(exportEsidocPositiveResponse.responseFromEsidocApi);
+        super(exportEsidocPositiveResponse.successfulUais);
+        this.alreadyExportedUais = new ArrayList<>();
+        this.exceptionUais = new ArrayList<>();
     }
 
     public ExportEsidocResponse(AlreadyExportedException alreadyExportedException){
-        super("");
+        super(new ArrayList<>());
         this.success = "failed";
         this.alreadyExportedUais = alreadyExportedException.getAlreadyExportedUais();
         this.exceptionUais = new ArrayList<>();

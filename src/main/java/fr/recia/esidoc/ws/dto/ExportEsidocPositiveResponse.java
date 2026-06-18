@@ -17,15 +17,17 @@ package fr.recia.esidoc.ws.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ExportEsidocPositiveResponse {
 
-    public ExportEsidocPositiveResponse(String responseFromEsidocApi){
-        this.responseFromEsidocApi = responseFromEsidocApi;
+    public ExportEsidocPositiveResponse(List<String> successfulUais){
+        this.successfulUais = successfulUais;
         success = "success";
     }
 
-    String responseFromEsidocApi;
+    List<String> successfulUais;
 
     // "success" "partial" ou "fail"
     String success;

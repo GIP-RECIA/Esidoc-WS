@@ -82,6 +82,8 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
         List<String> responses = new ArrayList<>();
 
+        List<String> successfulUais = new ArrayList<>();
+
         List<String> exceptionUais = new ArrayList<>();
 
         List<String> alreadyExportedUais = new ArrayList<>();
@@ -102,6 +104,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
                 }
                 String uaiToExport = uaiToUseSelector.apply(uaiIterated);
                 responses.add(exportService.exportMappingToUai(uaiToExport, xml));
+                successfulUais.add(uaiIterated);
                 delayService.applyDelayToUai(uaiIterated);
             }
             catch (Exception e) {
@@ -116,18 +119,18 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
             }
         }
 
-        String successfulJoined = String.join(System.lineSeparator()+System.lineSeparator(), responses);
+//        String successfulJoined = String.join(System.lineSeparator()+System.lineSeparator(), responses);
 
         // if there is at least one uai that thrown, throw an exception
         if(!exceptionUais.isEmpty()){
-            throw new GlobalExportAnnuaireException("Exception occured during export", exceptionUais, exceptionUais.size() != uais.size(), successfulJoined, alreadyExportedUais);
+            throw new GlobalExportAnnuaireException("Exception occured during export", exceptionUais, exceptionUais.size() != uais.size(), successfulUais, alreadyExportedUais);
         }
 
         if(alreadyExportedUais.size() == uais.size()){
             throw new AlreadyExportedException("All export were already done", alreadyExportedUais);
         }
 
-        return new ExportEsidocPositiveResponse(successfulJoined);
+        return new ExportEsidocPositiveResponse(successfulUais);
     }
 
 
