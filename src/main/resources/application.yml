@@ -74,3 +74,14 @@ app:
 #      - local
 #      - dev
 #      - ci
+  redis:
+    hostName: ""
+    userName: ""
+    password: ""
+    port: "6379"
+    databaseIndex: "0"
+    mappingPrefix: "${spring.redis.namespace}:mapping"
+
+  delay:
+    use-delay: true
+    duration-in-minutes: 30

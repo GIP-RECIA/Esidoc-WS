@@ -16,6 +16,7 @@
 package fr.recia.esidoc.ws.web.rest.exception;
 
 import fr.recia.esidoc.ws.dto.ExportEsidocResponse;
+import fr.recia.esidoc.ws.exception.AlreadyExportedException;
 import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -35,5 +36,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ResponseEntity<ExportEsidocResponse> handleGlobalExportAnnuaireException(HttpServletRequest request, Throwable ex) {
         final GlobalExportAnnuaireException e = (GlobalExportAnnuaireException) ex;
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).contentType(MediaType.APPLICATION_JSON).body(new ExportEsidocResponse(e));
+    }
+
+    @ExceptionHandler(AlreadyExportedException.class)
+    ResponseEntity<ExportEsidocResponse> handleAlreadyExportedException(HttpServletRequest request, Throwable ex) {
+        final AlreadyExportedException e = (AlreadyExportedException) ex;
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).contentType(MediaType.APPLICATION_JSON).body(new ExportEsidocResponse(e));
     }
 }

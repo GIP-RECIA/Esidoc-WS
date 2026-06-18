@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service;
+package fr.recia.esidoc.ws.dto;
 
+import lombok.Data;
 
-import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
-import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
+@Data
+public class ExportEsidocPositiveResponse {
 
-public interface IExportEsidocService {
+    public ExportEsidocPositiveResponse(String responseFromEsidocApi){
+        this.responseFromEsidocApi = responseFromEsidocApi;
+        success = "success";
+    }
 
-    public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException;
+    String responseFromEsidocApi;
+
+    // "success" "partial" ou "fail"
+    String success;
 
 }

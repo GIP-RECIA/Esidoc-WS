@@ -13,14 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service;
+package fr.recia.esidoc.ws.config.bean;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
-import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
+@Data
+@Slf4j
+@ConfigurationProperties(prefix = "app.redis")
+public class RedisProperties {
 
-public interface IExportEsidocService {
+    private String hostName;
 
-    public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException;
+    private int port;
+
+    private String userName;
+
+    private String password;
+
+    private int databaseIndex;
+
+    private String mappingPrefix;
+
 
 }

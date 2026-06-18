@@ -15,6 +15,7 @@
  */
 package fr.recia.esidoc.ws.dto;
 
+import fr.recia.esidoc.ws.exception.AlreadyExportedException;
 import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
 import lombok.Data;
 
@@ -22,24 +23,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ExportEsidocResponse {
+public class ExportEsidocResponse extends ExportEsidocPositiveResponse {
 
-    String responseFromEsidocApi;
     List<String> exceptionUais;
-    // "success" "partial" ou "fail"
-    String success;
+    List<String> alreadyExportedUais;
+
 
     public ExportEsidocResponse(String responseFromEsidocApi){
-        this.responseFromEsidocApi = responseFromEsidocApi;
-        this.success = "success";
+        super(responseFromEsidocApi);
     }
 
     public ExportEsidocResponse(GlobalExportAnnuaireException globalExportAnnuaireException){
+        super(globalExportAnnuaireException.getResponseMessage());
         this.exceptionUais = new ArrayList<>(globalExportAnnuaireException.getExceptionUais());
         this.success = globalExportAnnuaireException.isPartial() ? "partial" : "fail";
-        this.responseFromEsidocApi = globalExportAnnuaireException.getResponseMessage();
+        this.alreadyExportedUais = globalExportAnnuaireException.getAlreadyExportedUais();
     }
 
+
+    public ExportEsidocResponse(ExportEsidocPositiveResponse exportEsidocPositiveResponse){
+        super(exportEsidocPositiveResponse.responseFromEsidocApi);
+    }
+
+    public ExportEsidocResponse(AlreadyExportedException alreadyExportedException){
+        super("");
+        this.success = "failed";
+        this.alreadyExportedUais = alreadyExportedException.getAlreadyExportedUais();
+        this.exceptionUais = new ArrayList<>();
+    }
 
 
 

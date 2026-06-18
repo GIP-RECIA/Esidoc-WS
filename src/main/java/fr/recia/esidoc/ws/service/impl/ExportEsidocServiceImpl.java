@@ -18,12 +18,15 @@ package fr.recia.esidoc.ws.service.impl;
 import fr.recia.esidoc.ws.config.bean.ConfProperties;
 import fr.recia.esidoc.ws.config.bean.EsidocProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
+import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
+import fr.recia.esidoc.ws.exception.AlreadyExportedException;
 import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.InvalidUAIException;
 import fr.recia.esidoc.ws.exception.MappingValidationException;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
 import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
+import fr.recia.esidoc.ws.service.delay.IDelayService;
 import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
 import lombok.extern.slf4j.Slf4j;
@@ -70,8 +73,10 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
     @Autowired
     IStructureRegroupeeService structureRegroupeeService;
 
+    @Autowired
+    IDelayService delayService;
 
-    public String exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException {
+    public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException {
 
         List<String> uais = structureRegroupeeService.getUaisRegroupement(uai);
 
@@ -79,8 +84,15 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
         List<String> exceptionUais = new ArrayList<>();
 
+        List<String> alreadyExportedUais = new ArrayList<>();
+
         for(String uaiIterated : uais){
             // try catch in the for so exceptions for some uai does not prevent other to be exported
+            if(!delayService.canSendRequestToEsidocApi(uaiIterated)){
+                alreadyExportedUais.add(uaiIterated);
+                continue;
+            }
+
             try {
                 String xml;
                 try {
@@ -90,6 +102,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
                 }
                 String uaiToExport = uaiToUseSelector.apply(uaiIterated);
                 responses.add(exportService.exportMappingToUai(uaiToExport, xml));
+                delayService.applyDelayToUai(uaiIterated);
             }
             catch (Exception e) {
                 if (e instanceof MappingValidationException) {
@@ -107,10 +120,14 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
         // if there is at least one uai that thrown, throw an exception
         if(!exceptionUais.isEmpty()){
-            throw new GlobalExportAnnuaireException("Exception occured during export", exceptionUais, exceptionUais.size() != uais.size(), successfulJoined);
+            throw new GlobalExportAnnuaireException("Exception occured during export", exceptionUais, exceptionUais.size() != uais.size(), successfulJoined, alreadyExportedUais);
         }
 
-        return successfulJoined;
+        if(alreadyExportedUais.size() == uais.size()){
+            throw new AlreadyExportedException("All export were already done", alreadyExportedUais);
+        }
+
+        return new ExportEsidocPositiveResponse(successfulJoined);
     }
 
 

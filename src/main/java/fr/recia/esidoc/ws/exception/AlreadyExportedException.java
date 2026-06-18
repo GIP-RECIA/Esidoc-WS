@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service;
+package fr.recia.esidoc.ws.exception;
 
+import lombok.Getter;
 
-import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
-import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface IExportEsidocService {
+@Getter
+public class AlreadyExportedException extends RuntimeException {
+    public AlreadyExportedException(String message, List<String> alreadyExportedUais) {
+        super(message);
+       this.alreadyExportedUais = alreadyExportedUais;
+    }
 
-    public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException;
+    List<String> alreadyExportedUais;
 
 }

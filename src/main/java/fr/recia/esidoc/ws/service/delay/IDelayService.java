@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.service;
+package fr.recia.esidoc.ws.service.delay;
 
 
-import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
-import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
+public interface IDelayService {
 
-public interface IExportEsidocService {
+   boolean canSendRequestToEsidocApi(String uai);
 
-    public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException;
+   void applyDelayToUai(String uai);
 
 }
