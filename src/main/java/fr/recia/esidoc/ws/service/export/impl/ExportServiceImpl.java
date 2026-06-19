@@ -54,7 +54,7 @@ public class ExportServiceImpl implements IExportService {
 
     @Override
     public String exportMappingToUai(String uai, String xml){
-        log.info("xml variable in export method {}", xml);
+        log.trace("xml variable in export method {}", xml);
         String url = esidocProperties.getExportAnnuaireUri().replace(RNE_SLUG, uai);
         try {
             log.debug("Requesting {}", url);

@@ -65,7 +65,7 @@ public class MappingServiceImpl implements IMappingService {
         String xml =
                 "<?xml version=\"1.0\" encoding=\"windows-1252\"?>\r\n"
                         + xmlBody;
-        log.debug(xml);
+        log.trace(xml);
             xmlValidator.validate(xml);
         return xml;
     }
