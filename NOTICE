@@ -53,6 +53,7 @@ This project includes:
   JUnit Platform Commons under Eclipse Public License v2.0
   JUnit Platform Engine API under Eclipse Public License v2.0
   LatencyUtils under Public Domain, per Creative Commons CC0
+  Lettuce under MIT
   Log4j API to SLF4J Adapter under Apache-2.0
   Logback Classic Module under Eclipse Public License - v 2.0 or GNU Lesser General Public License
   Logback Core Module under Eclipse Public License - v 2.0 or GNU Lesser General Public License
@@ -61,20 +62,37 @@ This project includes:
   micrometer-observation under The Apache Software License, Version 2.0
   mockito-core under MIT
   mockito-junit-jupiter under MIT
+  Netty/Buffer under Apache License, Version 2.0
+  Netty/Codec/Base under Apache License, Version 2.0
+  Netty/Codec/DNS under Apache License, Version 2.0
+  Netty/Common under Apache License, Version 2.0
+  Netty/Handler under Apache License, Version 2.0
+  Netty/Resolver under Apache License, Version 2.0
+  Netty/Resolver/DNS under Apache License, Version 2.0
+  Netty/Transport under Apache License, Version 2.0
+  Netty/Transport/Native/Unix/Common under Apache License, Version 2.0
+  Non-Blocking Reactive Foundation for the JVM under Apache License, Version 2.0
   Objenesis under Apache License, Version 2.0
   org.apiguardian:apiguardian-api under The Apache License, Version 2.0
   org.opentest4j:opentest4j under The Apache License, Version 2.0
   org.xmlunit:xmlunit-core under The Apache Software License, Version 2.0
   Project Lombok under The MIT License
+  reactive-streams under MIT-0
+  redis-authx-core under MIT
   SLF4J API Module under MIT
   SnakeYAML under Apache License, Version 2.0
   Spring AOP under Apache License, Version 2.0
   Spring Beans under Apache License, Version 2.0
+  Spring Commons Logging Bridge under Apache License, Version 2.0
   Spring Context under Apache License, Version 2.0
+  Spring Context Support under Apache License, Version 2.0
   Spring Core under Apache License, Version 2.0
   Spring Data Core under Apache License, Version 2.0
+  Spring Data KeyValue under Apache License, Version 2.0
   Spring Data LDAP under Apache License, Version 2.0
+  Spring Data Redis under Apache License, Version 2.0
   Spring Expression Language (SpEL) under Apache License, Version 2.0
+  Spring Object/XML Marshalling under Apache License, Version 2.0
   Spring TestContext Framework under Apache License, Version 2.0
   Spring Transaction under Apache License, Version 2.0
   Spring Web under Apache License, Version 2.0
@@ -87,11 +105,14 @@ This project includes:
   spring-boot-jackson under Apache License, Version 2.0
   spring-boot-ldap under Apache License, Version 2.0
   spring-boot-persistence under Apache License, Version 2.0
+  spring-boot-security under Apache License, Version 2.0
   spring-boot-servlet under Apache License, Version 2.0
   spring-boot-starter under Apache License, Version 2.0
   spring-boot-starter-data-ldap under Apache License, Version 2.0
+  spring-boot-starter-data-redis under Apache License, Version 2.0
   spring-boot-starter-jackson under Apache License, Version 2.0
   spring-boot-starter-logging under Apache License, Version 2.0
+  spring-boot-starter-security under Apache License, Version 2.0
   spring-boot-starter-test under Apache License, Version 2.0
   spring-boot-starter-tomcat under Apache License, Version 2.0
   spring-boot-starter-tomcat-runtime under Apache License, Version 2.0
@@ -105,6 +126,11 @@ This project includes:
   spring-boot-web-server under Apache License, Version 2.0
   spring-boot-webmvc under Apache License, Version 2.0
   spring-ldap-core under Apache License, Version 2.0
+  spring-security-config under Apache License, Version 2.0
+  spring-security-core under Apache License, Version 2.0
+  spring-security-crypto under Apache License, Version 2.0
+  spring-security-web under Apache License, Version 2.0
+  spring-session-core under Apache License, Version 2.0
   Stax2 API under The BSD 2-Clause License
   tomcat-embed-core under Apache License, Version 2.0
   tomcat-embed-el under Apache License, Version 2.0
