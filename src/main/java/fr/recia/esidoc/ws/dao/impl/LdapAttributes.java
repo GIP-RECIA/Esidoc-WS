@@ -33,9 +33,14 @@ public class LdapAttributes {
     public static final String ENT_PERSON_PROFILS= "ENTPersonProfils";
     public static final String ENT_PERSON_MOBILE_SMS = "ENTPersonMobileSMS";
     public static final String ENT_ELEVE_CLASSES = "ENTEleveClasses";
+    public static final String ENT_ELEVE_GROUPES = "ENTEleveGroupes";
+    public static final String ENT_STRUCTURE_SIREN = "ENTStructureSIREN";
+
+    public static final Set<String> ETAB_ATTRS = Stream.of(ENT_STRUCTURE_SIREN)
+            .collect(Collectors.toSet());
 
     public static final Set<String> PERSON_ATTRS =
-            Stream.of(UID, SN, GIVEN_NAME, ENT_PERSON_CODE_POSTAL, ENT_PERSON_VILLE, ENT_PERSON_ADRESSE, ENT_PERSON_DATE_NAISSANCE, ENT_ELEVE_PERS_REL_ELEVE, ESCO_PERSON_EXTERNAL_IDS, ENT_PERSON_PROFILS, MAIL, ENT_PERSON_MOBILE_SMS, ENT_ELEVE_CLASSES)
+            Stream.of(UID, SN, GIVEN_NAME, ENT_PERSON_CODE_POSTAL, ENT_PERSON_VILLE, ENT_PERSON_ADRESSE, ENT_PERSON_DATE_NAISSANCE, ENT_ELEVE_PERS_REL_ELEVE, ESCO_PERSON_EXTERNAL_IDS, ENT_PERSON_PROFILS, MAIL, ENT_PERSON_MOBILE_SMS, ENT_ELEVE_CLASSES, ENT_ELEVE_GROUPES)
                     .collect(Collectors.toSet());
 
     public static Set<String> PARENT_ATTRS =

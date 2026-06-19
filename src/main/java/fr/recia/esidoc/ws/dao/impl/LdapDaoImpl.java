@@ -20,15 +20,16 @@ import fr.recia.esidoc.ws.config.bean.MappingProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.Parent;
+import fr.recia.esidoc.ws.service.bean.IExtractEntEleveGroup;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
+import fr.recia.esidoc.ws.service.bean.impl.ExtractEntEleveGroup;
 import fr.recia.esidoc.ws.service.util.MappingStatusUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.Filter;
@@ -92,14 +93,14 @@ public class LdapDaoImpl implements ILdapDao {
     }
 
     @Override
-    public boolean isValidUai(String uai) {
+    public String getSirenForUai(String uai) {
         final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getValidUai(), uai));
         LdapQuery query = LdapQueryBuilder.query().countLimit(1)
+                .attributes(LdapAttributes.ETAB_ATTRS.toArray(new String[LdapAttributes.ETAB_ATTRS.size()]))
                 .base(ldapProperties.getStructureRootDn()).filter(filter);
-        return !ldapTemplate.search(
-                query,
-                (AttributesMapper<Void>) attrs -> null
-        ).isEmpty();
+        ContextMapper<String> mapper = new EtabAttributesMapper();
+        List<String> etabs = ldapTemplate.search(query,mapper);
+        return etabs.getFirst();
     }
 
     @Override
@@ -107,14 +108,15 @@ public class LdapDaoImpl implements ILdapDao {
         findAllparents(uai);
         final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getEmprunteurs(), uai));
         log.debug("LDAP filter applied : " + filter);
-
+        String siren =  getSirenForUai(uai);
         ContextMapper<Emprunteurs> mapper = new EmprunteursAttributesMapper(
                 extractOpaqueId,
                 mappingStatusUtils,
                 mappingProperties,
                 parentMap,
                 extractUIDFromDN,
-                Pattern.compile(ldapProperties.getAutorizedResponsablePattern())
+                Pattern.compile(ldapProperties.getAutorizedResponsablePattern()),
+                new ExtractEntEleveGroup(Pattern.compile(String.format(ldapProperties.getEleveGroupePattern(),siren)))
         );
         LdapQuery query = LdapQueryBuilder.query()
                 .attributes(LdapAttributes.PERSON_ATTRS.toArray(new String[LdapAttributes.PERSON_ATTRS.size()]))

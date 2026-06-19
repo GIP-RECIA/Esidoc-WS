@@ -36,9 +36,9 @@ public class Emprunteurs {
     @JacksonXmlProperty(localName = "EMPRUNTEUR_M")
     String nomPrenom;
 
-    // DATE_NAISSANCE_M
-    @JacksonXmlProperty(localName = "DATE_NAISSANCE_M")
-    String dateNaissance;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JacksonXmlProperty(localName = "DIVEMPR_M")
+    String groupe;
 
     @JacksonXmlProperty(localName = "ADRESSE_M")
     String adresse ="";

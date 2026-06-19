@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.dao;
+package fr.recia.esidoc.ws.service.bean;
 
-import fr.recia.esidoc.ws.model.Emprunteurs;
-import jakarta.validation.constraints.NotBlank;
+import org.springframework.ldap.core.DirContextAdapter;
 
-import java.util.List;
+import javax.naming.NamingException;
 
-public interface ILdapDao {
+public interface IExtractEntEleveGroup {
 
-    String getSirenForUai(@NotBlank final String uai);
-
-    List<Emprunteurs> findAllEmprunteurs(@NotBlank final String uai);
+    String extractGroup(final DirContextAdapter context) throws NamingException;
 }
+

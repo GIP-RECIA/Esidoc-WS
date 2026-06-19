@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.recia.esidoc.ws.dao;
+package fr.recia.esidoc.ws.dao.impl;
 
-import fr.recia.esidoc.ws.model.Emprunteurs;
-import jakarta.validation.constraints.NotBlank;
+import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.DirContextAdapter;
 
-import java.util.List;
+import javax.naming.NamingException;
 
-public interface ILdapDao {
+public class EtabAttributesMapper  implements ContextMapper<String> {
 
-    String getSirenForUai(@NotBlank final String uai);
 
-    List<Emprunteurs> findAllEmprunteurs(@NotBlank final String uai);
+    @Override
+    public String mapFromContext(Object ctx) throws NamingException {
+        DirContextAdapter context = (DirContextAdapter) ctx;
+        return (context.getStringAttribute(LdapAttributes.ENT_STRUCTURE_SIREN));
+    }
 }

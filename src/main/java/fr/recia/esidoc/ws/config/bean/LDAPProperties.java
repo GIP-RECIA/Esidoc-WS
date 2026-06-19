@@ -53,6 +53,8 @@ public class LDAPProperties {
 
     String autorizedResponsablePattern;
 
+    String eleveGroupePattern;
+
     @PostConstruct
     void init(){
         log.info(this.toString());
@@ -75,6 +77,7 @@ public class LDAPProperties {
                 ", structureRootDn='" + structureRootDn + '\'' +
                 ", userUidExtractorPattern='" + userUidExtractorPattern + '\'' +
                 ", autorizedResponsablePattern='" + autorizedResponsablePattern + '\'' +
+                ", eleveGroupePattern='" + eleveGroupePattern + '\'' +
                 '}';
     }
 }

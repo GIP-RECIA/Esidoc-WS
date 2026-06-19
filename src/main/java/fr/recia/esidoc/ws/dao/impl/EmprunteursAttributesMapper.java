@@ -22,6 +22,7 @@ package fr.recia.esidoc.ws.dao.impl;
 import fr.recia.esidoc.ws.config.bean.MappingProperties;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.Parent;
+import fr.recia.esidoc.ws.service.bean.IExtractEntEleveGroup;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
 import fr.recia.esidoc.ws.service.util.MappingStatusUtils;
@@ -50,11 +51,6 @@ import java.util.regex.Pattern;
 @Slf4j
 public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 
-//	@NotNull
-//	private IIDMapper userMapper;
-//
-//	@NotNull
-
 	private IExtractOpaqueId extractOpaqueId;
 
 	private MappingStatusUtils mappingStatusUtils;
@@ -68,6 +64,9 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 
 	@NotNull
 	private Pattern responsablePattern;
+
+	private IExtractEntEleveGroup extractEntEleveGroup;
+
 
 	@Override
 	public Emprunteurs mapFromContext(Object ctx) throws NamingException {
@@ -164,12 +163,15 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 
 		emprunteurs.setIdentiteEnt(extractOpaqueId.getOpaqueId(context));
 
-		emprunteurs.setDateNaissance(context.getStringAttribute(LdapAttributes.ENT_PERSON_DATE_NAISSANCE));
 
+		String groupe = extractEntEleveGroup.extractGroup(context);
 
-		String date = context.getStringAttribute(LdapAttributes.ENT_PERSON_DATE_NAISSANCE);
-		emprunteurs.setDateNaissance(date);
-
+		log.info("groups {}", (Object) context.getStringAttributes(LdapAttributes.ENT_ELEVE_GROUPES));
+		log.info("ewann groupe {}", groupe);
+		if(Objects.nonNull(groupe) && !groupe.trim().isEmpty()){
+			//todo add here
+			emprunteurs.setGroupe(groupe);
+		}
 		char[] chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 				.toCharArray();
 
@@ -184,7 +186,6 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 		//obligatoire = date naissance, nom prenom compte, mot de passe et identite ent
 
         try {
-            Assert.hasText(emprunteurs.getDateNaissance(), "DATE_NAISSANCE_M (dateNaissance) should not be null or blank");
             Assert.hasText(emprunteurs.getNomPrenom(), "EMPRUNTEUR_M (nomPrenom) should not be null or blank");
             Assert.hasText(emprunteurs.getCompte(), "COMPTE_M (compte) should not be null or blank");
             Assert.hasText(emprunteurs.getMotDePasse(), "MOT_DE_PASSE_M (motDePass) should not be null or blank");
