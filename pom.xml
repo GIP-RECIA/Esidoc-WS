@@ -23,10 +23,10 @@
         <developer/>
     </developers>
     <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
+        <connection>scm:git:ssh://git@github.com/GIP-RECIA/Esidoc-WS.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/GIP-RECIA/Esidoc-WS.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/GIP-RECIA/Esidoc-WS.git</url>
     </scm>
     <distributionManagement>
         <repository>
