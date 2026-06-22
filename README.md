@@ -17,3 +17,7 @@ It should be only disabled in prod or when using custom uri (pointing to a json 
 - `mvn license:check`
 - `mvn license:format`
 - `mvn license:remove`
+
+### To run with external configuration
+
+- `mvn spring-boot:run -Dspring-boot.run.profiles=local -Dspring-boot.run.arguments="--spring.config.additional-location=file:${PATH_PROPERTIES}/ESIDOC-WS/"`
