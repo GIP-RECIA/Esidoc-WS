@@ -23,16 +23,14 @@ import java.util.List;
 
 @Getter
 public class GlobalExportAnnuaireException extends RuntimeException {
-    public GlobalExportAnnuaireException(String message, List<String> exceptionUais, boolean partial, List<String> successfulUais, List<String> alreadyExportedUais) {
+    public GlobalExportAnnuaireException(String message, String exceptionUai, String successfulUai, String alreadyExportedUai) {
         super(message);
-        this.exceptionUais = new ArrayList<>(exceptionUais);
-        this.partial = partial;
-        this.successfulUais = successfulUais;
-        this.alreadyExportedUais = alreadyExportedUais;
+        this.exceptionUai = exceptionUai;
+        this.successfulUai = successfulUai;
+        this.alreadyExportedUai = alreadyExportedUai;
     }
 
-    private final boolean partial;
-    private final List<String> successfulUais;
-    private final List<String> exceptionUais;
-    private final List<String> alreadyExportedUais;
+    private final String successfulUai;
+    private final String exceptionUai;
+    private final String alreadyExportedUai;
 }

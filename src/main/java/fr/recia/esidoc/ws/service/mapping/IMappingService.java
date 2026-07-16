@@ -15,10 +15,14 @@
  */
 package fr.recia.esidoc.ws.service.mapping;
 
+import fr.recia.esidoc.ws.model.Emprunteurs;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface IMappingService {
-    public String getValidatedXmlForUai(String uai) throws IOException, SAXException;
+
+    public List<Emprunteurs> getEmprunteurs(String uai);
+    public String getValidatedXml(List<Emprunteurs> emprunteursList) throws IOException, SAXException;
 }

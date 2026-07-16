@@ -28,29 +28,24 @@ public class ExportEsidocResponse extends ExportEsidocPositiveResponse {
     List<String> exceptionUais;
     List<String> alreadyExportedUais;
 
-
-    public ExportEsidocResponse(List<String> responseFromEsidocApi){
-        super(responseFromEsidocApi);
-    }
-
     public ExportEsidocResponse(GlobalExportAnnuaireException globalExportAnnuaireException){
-        super(globalExportAnnuaireException.getSuccessfulUais());
-        this.exceptionUais = new ArrayList<>(globalExportAnnuaireException.getExceptionUais());
-        this.success = globalExportAnnuaireException.isPartial() ? "partial" : "fail";
-        this.alreadyExportedUais = globalExportAnnuaireException.getAlreadyExportedUais();
+        super(globalExportAnnuaireException.getSuccessfulUai());
+        this.exceptionUais = List.of(globalExportAnnuaireException.getExceptionUai());
+        this.success = "fail";
+        this.alreadyExportedUais = List.of(globalExportAnnuaireException.getAlreadyExportedUai());
     }
 
 
     public ExportEsidocResponse(ExportEsidocPositiveResponse exportEsidocPositiveResponse){
-        super(exportEsidocPositiveResponse.successfulUais);
+        super(!exportEsidocPositiveResponse.getSuccessfulUais().isEmpty() ? exportEsidocPositiveResponse.getSuccessfulUais().getFirst() : null);
         this.alreadyExportedUais = new ArrayList<>();
         this.exceptionUais = new ArrayList<>();
     }
 
     public ExportEsidocResponse(AlreadyExportedException alreadyExportedException){
-        super(new ArrayList<>());
+        super(null);
         this.success = "failed";
-        this.alreadyExportedUais = alreadyExportedException.getAlreadyExportedUais();
+        this.alreadyExportedUais = List.of(alreadyExportedException.getAlreadyExportedUai());
         this.exceptionUais = new ArrayList<>();
     }
 
