@@ -51,8 +51,13 @@ public class MappingServiceImpl implements IMappingService {
     ILdapDao ldapDao;
 
     @Override
-    public String getValidatedXmlForUai(String uai) throws IOException, SAXException {
-        List<Emprunteurs> emprunteursList =  ldapDao.findAllEmprunteurs(uai);
+    public List<Emprunteurs> getEmprunteurs(String uai) {
+        return ldapDao.findAllEmprunteurs(uai);
+    }
+
+    @Override
+    public String getValidatedXml(List<Emprunteurs> emprunteursList) throws IOException, SAXException {
+
         log.trace(emprunteursList.toString());
 
         FichesXml fichesXml = new FichesXml();

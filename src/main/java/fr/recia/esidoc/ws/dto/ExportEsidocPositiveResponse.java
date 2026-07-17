@@ -17,19 +17,21 @@ package fr.recia.esidoc.ws.dto;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class ExportEsidocPositiveResponse {
 
-    public ExportEsidocPositiveResponse(List<String> successfulUais){
-        this.successfulUais = successfulUais;
+    public ExportEsidocPositiveResponse(String successfulUai){
+        this.successfulUais = Objects.nonNull(successfulUai) ? List.of(successfulUai) : new ArrayList<>();
         success = "success";
     }
 
     List<String> successfulUais;
 
-    // "success" "partial" ou "fail"
+    // "success" or "fail"
     String success;
 
 }

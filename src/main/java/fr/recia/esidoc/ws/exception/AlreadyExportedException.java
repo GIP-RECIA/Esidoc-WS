@@ -22,11 +22,11 @@ import java.util.List;
 
 @Getter
 public class AlreadyExportedException extends RuntimeException {
-    public AlreadyExportedException(String message, List<String> alreadyExportedUais) {
+    public AlreadyExportedException(String message, String alreadyExportedUai) {
         super(message);
-       this.alreadyExportedUais = alreadyExportedUais;
+       this.alreadyExportedUai = alreadyExportedUai;
     }
 
-    List<String> alreadyExportedUais;
+    String alreadyExportedUai;
 
 }

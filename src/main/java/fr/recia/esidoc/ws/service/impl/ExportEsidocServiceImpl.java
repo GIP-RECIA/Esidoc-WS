@@ -24,6 +24,7 @@ import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.InvalidUAIException;
 import fr.recia.esidoc.ws.exception.MappingValidationException;
+import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
 import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
 import fr.recia.esidoc.ws.service.delay.IDelayService;
@@ -79,32 +80,19 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
         List<String> uais = structureRegroupeeService.getUaisRegroupement(uai);
 
-        List<String> responses = new ArrayList<>();
+        if(!delayService.canSendRequestToEsidocApi(uai)){
+            throw new AlreadyExportedException("All export were already done", uai);
+        }
 
-        List<String> successfulUais = new ArrayList<>();
 
-        List<String> exceptionUais = new ArrayList<>();
-
-        List<String> alreadyExportedUais = new ArrayList<>();
+        List<Emprunteurs> allEmprunteurs = new ArrayList<>();
 
         for(String uaiIterated : uais){
             // try catch in the for so exceptions for some uai does not prevent other to be exported
-            if(!delayService.canSendRequestToEsidocApi(uaiIterated)){
-                alreadyExportedUais.add(uaiIterated);
-                continue;
-            }
-
             try {
-                String xml;
-                try {
-                    xml = mappingService.getValidatedXmlForUai(uai);
-                } catch (IOException | SAXException e) {
-                    throw new MappingValidationException("Error when trying to validate XML for " +uai);
-                }
-                String uaiToExport = uaiToUseSelector.apply(uaiIterated);
-                responses.add(exportService.exportMappingToUai(uaiToExport, xml));
-                successfulUais.add(uaiIterated);
-                delayService.applyDelayToUai(uaiIterated);
+                List<Emprunteurs> emprunteursList;
+                emprunteursList = mappingService.getEmprunteurs(uai);
+                allEmprunteurs.addAll(emprunteursList);
             }
             catch (Exception e) {
                 if (e instanceof MappingValidationException) {
@@ -114,21 +102,19 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
                 } else {
                     log.error("Unexpected exception", e);
                 }
-               exceptionUais.add(uaiIterated);
             }
         }
 
-//        String successfulJoined = String.join(System.lineSeparator()+System.lineSeparator(), responses);
-
-        // if there is at least one uai that thrown, throw an exception
-        if(!exceptionUais.isEmpty()){
-            throw new GlobalExportAnnuaireException("Exception occured during export", exceptionUais, exceptionUais.size() != uais.size(), successfulUais, alreadyExportedUais);
+        try {
+            String xml = mappingService.getValidatedXml(allEmprunteurs);
+            exportService.exportMappingToUai(uai, xml);
+        } catch (IOException | SAXException e) {
+            throw new MappingValidationException("Error when trying to validate XML for " + uai);
         }
 
-        if(alreadyExportedUais.size() == uais.size()){
-            throw new AlreadyExportedException("All export were already done", alreadyExportedUais);
-        }
 
-        return new ExportEsidocPositiveResponse(successfulUais);
+
+        delayService.applyDelayToUai(uai);
+        return new ExportEsidocPositiveResponse(uai);
     }
 }
