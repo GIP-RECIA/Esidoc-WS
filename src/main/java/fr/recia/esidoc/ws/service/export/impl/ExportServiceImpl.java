@@ -36,6 +36,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
+
 
 @Slf4j
 @Service
@@ -59,7 +61,7 @@ public class ExportServiceImpl implements IExportService {
         try {
             log.debug("Requesting {}", url);
             HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.setContentType(MediaType.APPLICATION_XML);
+            requestHeaders.setContentType(new MediaType(MediaType.APPLICATION_XML, StandardCharsets.UTF_8));
             requestHeaders.setBearerAuth(serviceToken.getToken());
             HttpEntity<String> requestEntity = new HttpEntity<String>(xml, requestHeaders);
 
