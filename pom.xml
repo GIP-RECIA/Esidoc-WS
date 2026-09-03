@@ -9,8 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>fr.recia.esidoc.ws</groupId>
-    <artifactId>esco-esidoc-ws</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>esidoc-ws</artifactId>
+    <version>0.0.2</version>
     <packaging>war</packaging>
     <name>esco-esidoc-ws</name>
     <inceptionYear>2026</inceptionYear>
@@ -18,7 +18,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/GIP-RECIA/Esidoc-WS.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/GIP-RECIA/Esidoc-WS.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.0.2</tag>
         <url>https://github.com/GIP-RECIA/Esidoc-WS.git</url>
     </scm>
     <distributionManagement>
