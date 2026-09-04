@@ -95,11 +95,9 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 		// STATUS
 		emprunteurs.setStatut(statusToUse);
 
-
 		if(eleveStatus.equals(statusToUse)){
 			//si eleve, il faut renseigner la classe
 			String[] classes= context.getStringAttributes(LdapAttributes.ENT_ELEVE_CLASSES);
-
 			String[] array = classes[0].split("\\$");
 			emprunteurs.setClasse(array[array.length-1]);
 			// si eleve, il faut obtenir via parent
@@ -110,18 +108,18 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 				List<Parent> parentList = new ArrayList<>();
 				for (String parent : parents) {
 					final String parentUid = extractUIDFromDN.getUidFromDN(parent);
-
 					if(parentMap.containsKey(parentUid)){
 						parentList.add(parentMap.get(parentUid));
-					}else{
+					} else {
 						String message = String.format("Parent %s of Elève %s not found in parent map", parentUid, uid);
-						log.info(message);
 						log.warn(message);
 					}
 				}
 
 			    Optional<Parent> optionalParent = parentList.stream().filter(x -> !isNullOrEmpty(x.getTel())).findFirst();
-				Parent parentEntity = optionalParent.orElseGet(parentList::getFirst);
+				// Attention si pour un elève ses parents sont en delete ils ne vont pas remonter. S'ils ne remontent pas on ingore ces attributs
+				if(!parentList.isEmpty()){
+					Parent parentEntity = optionalParent.orElseGet(parentList::getFirst);
 					// adresse
 					emprunteurs.setAdresse(parentEntity.getAdresse());
 					// code postal
@@ -130,6 +128,7 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 					emprunteurs.setVille(parentEntity.getVille());
 					//tel
 					emprunteurs.setTel(parentEntity.getTel());
+				}
 			}else{
 				String message = String.format("Elève %s doesn't have any parent", uid);
 				log.info(message);
@@ -167,7 +166,6 @@ public class EmprunteursAttributesMapper implements ContextMapper<Emprunteurs> {
 		String groupe = extractEntEleveGroup.extractGroup(context);
 
 		log.info("groups {}", (Object) context.getStringAttributes(LdapAttributes.ENT_ELEVE_GROUPES));
-		log.info("ewann groupe {}", groupe);
 		if(Objects.nonNull(groupe) && !groupe.trim().isEmpty()){
 			//todo add here
 			emprunteurs.setGroupe(groupe);
