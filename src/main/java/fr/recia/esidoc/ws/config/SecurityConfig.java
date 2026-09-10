@@ -15,6 +15,7 @@
  */
 package fr.recia.esidoc.ws.config;
 
+import fr.recia.esidoc.ws.config.bean.SecurityProperties;
 import fr.recia.esidoc.ws.config.security.AuthenticationFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -23,25 +24,50 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.List;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final SecurityProperties securityProperties;
+    private final AuthenticationFilter authenticationFilter;
+
+    public SecurityConfig(SecurityProperties securityProperties, AuthenticationFilter authenticationFilter) {
+        this.securityProperties = securityProperties;
+        this.authenticationFilter = authenticationFilter;
+    }
+
+    static String buildAccessExpression(List<String> authorizedIps) {
+        StringBuilder hasIpAddress = new StringBuilder(
+                "hasIpAddress('127.0.0.1') or hasIpAddress('::1')"
+        );
+        for (String ip : authorizedIps) {
+            hasIpAddress.append(" or hasIpAddress('").append(ip).append("')");
+        }
+
+        return "isAuthenticated() and (" + hasIpAddress + ")";
+    }
+
     @Bean
     @Order(1)
-    SecurityFilterChain adminChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain adminChain(HttpSecurity http) {
+        String accessExpression = buildAccessExpression(this.securityProperties.getAuthorizedIpAccess());
+
         http.securityMatcher("/api/**")
-                .addFilterBefore(new AuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().access(new WebExpressionAuthorizationManager(accessExpression)));
         return http.build();
     }
 
     @Bean
     @Order(2)
-    SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain defaultChain(HttpSecurity http) {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/health-check").permitAll()
                 .anyRequest().permitAll());
