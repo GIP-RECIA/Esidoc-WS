@@ -15,44 +15,32 @@
  */
 package fr.recia.esidoc.ws.config.security;
 
-import fr.recia.esidoc.ws.config.bean.SecurityProperties;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import fr.recia.esidoc.ws.config.bean.SecurityProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
+import org.springframework.stereotype.Service;
 
 
 @Slf4j
-@Component
+@Service
+@RequiredArgsConstructor
 public class AuthenticationService {
     private static final String AUTH_TOKEN_HEADER_NAME = "x-api-key";
 
-    private static SecurityProperties securityProperties;
+    private final SecurityProperties config;
 
-    @Autowired
-    private SecurityProperties config;
-
-    @PostConstruct
-    private void setUp() {
-        securityProperties = this.config;
-    }
-
-    public static Authentication getAuthentication(HttpServletRequest request) {
-        Assert.notNull(securityProperties, "You have a misconfiguration of the class with the injected bean appConfProperties !");
+    public Authentication getAuthentication(HttpServletRequest request) {
 
         final String apiKey = request.getHeader(AUTH_TOKEN_HEADER_NAME);
-        log.debug("getAuthentication - check for token {}", apiKey);
-        if (!securityProperties.getApiKey().equals(apiKey)) {
+        if (!this.config.getApiKey().equals(apiKey)) {
             log.warn("Access with token '{}' isn't authorized - access from IP '{}'", apiKey, request.getRemoteAddr());
             throw new BadCredentialsException("Invalid API Key");
         }
-        final String clientId = securityProperties.getApiKey();
-        log.info("getAuthentication - authorization for clientId '{}' from IP '{}'", clientId, request.getRemoteAddr());
+        final String clientId = this.config.getApiKey();
         return new ApiKeyAuthentication(clientId, AuthorityUtils.NO_AUTHORITIES);
     }
 }
