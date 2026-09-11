@@ -15,6 +15,7 @@
  */
 package fr.recia.esidoc.ws.service.impl;
 
+import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
 import fr.recia.esidoc.ws.service.delay.IDelayService;
@@ -28,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,23 +53,28 @@ class ExportEsidocServiceImplTest {
     ExportEsidocServiceImpl service;
 
     @Test
-    void shouldQueryAndMergeEmprunteursFromEveryUaiOfTheGroup() throws Exception {
-        final Emprunteurs fromA = new Emprunteurs();
-        fromA.setNomPrenom("A");
-        final Emprunteurs fromB = new Emprunteurs();
-        fromB.setNomPrenom("B");
+    void shouldExportUnderTheParentUaiWhenCalledWithAChildUai() throws Exception {
+        final Emprunteurs fromParent = new Emprunteurs();
+        fromParent.setNomPrenom("parent");
+        final Emprunteurs fromChild = new Emprunteurs();
+        fromChild.setNomPrenom("child");
 
-        when(structureRegroupeeService.getUaisRegroupement("uaiA")).thenReturn(List.of("uaiA", "uaiB"));
-        when(delayService.canSendRequestToEsidocApi("uaiA")).thenReturn(true);
-        when(mappingService.getEmprunteurs("uaiA")).thenReturn(List.of(fromA));
-        when(mappingService.getEmprunteurs("uaiB")).thenReturn(List.of(fromB));
+        when(structureRegroupeeService.getUaisRegroupement("uaiChild")).thenReturn(List.of("uaiParent", "uaiChild"));
+        when(structureRegroupeeService.getParentUai("uaiChild")).thenReturn("uaiParent");
+        when(delayService.canSendRequestToEsidocApi("uaiParent")).thenReturn(true);
+        when(mappingService.getEmprunteurs("uaiParent")).thenReturn(List.of(fromParent));
+        when(mappingService.getEmprunteurs("uaiChild")).thenReturn(List.of(fromChild));
         when(mappingService.getValidatedXml(anyList())).thenReturn("<xml/>");
 
-        service.exportAnnuaireForUai("uaiA");
+        final ExportEsidocPositiveResponse response = service.exportAnnuaireForUai("uaiChild");
 
-        verify(mappingService).getEmprunteurs("uaiA");
-        verify(mappingService).getEmprunteurs("uaiB");
-        verify(mappingService).getValidatedXml(List.of(fromA, fromB));
+        verify(mappingService).getEmprunteurs("uaiParent");
+        verify(mappingService).getEmprunteurs("uaiChild");
+        verify(mappingService).getValidatedXml(List.of(fromParent, fromChild));
+        verify(delayService).canSendRequestToEsidocApi("uaiParent");
+        verify(exportService).exportMappingToUai("uaiParent", "<xml/>");
+        verify(delayService).applyDelayToUai("uaiParent");
+        assertThat(response.getSuccessfulUais()).containsExactly("uaiParent");
     }
 
     @Test
@@ -76,6 +83,7 @@ class ExportEsidocServiceImplTest {
         solo.setNomPrenom("solo");
 
         when(structureRegroupeeService.getUaisRegroupement("uaiSolo")).thenReturn(List.of("uaiSolo"));
+        when(structureRegroupeeService.getParentUai("uaiSolo")).thenReturn("uaiSolo");
         when(delayService.canSendRequestToEsidocApi("uaiSolo")).thenReturn(true);
         when(mappingService.getEmprunteurs("uaiSolo")).thenReturn(List.of(solo));
         when(mappingService.getValidatedXml(anyList())).thenReturn("<xml/>");
@@ -84,5 +92,7 @@ class ExportEsidocServiceImplTest {
 
         verify(mappingService).getEmprunteurs("uaiSolo");
         verify(mappingService).getValidatedXml(List.of(solo));
+        verify(exportService).exportMappingToUai("uaiSolo", "<xml/>");
+        verify(delayService).applyDelayToUai("uaiSolo");
     }
 }

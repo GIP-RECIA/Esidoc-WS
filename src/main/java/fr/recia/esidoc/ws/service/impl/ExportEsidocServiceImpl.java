@@ -22,7 +22,6 @@ import fr.recia.esidoc.ws.dto.ExportEsidocPositiveResponse;
 import fr.recia.esidoc.ws.exception.AlreadyExportedException;
 import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
 import fr.recia.esidoc.ws.exception.GlobalExportAnnuaireException;
-import fr.recia.esidoc.ws.exception.InvalidUAIException;
 import fr.recia.esidoc.ws.exception.MappingValidationException;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.service.IExportEsidocService;
@@ -30,9 +29,8 @@ import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
 import fr.recia.esidoc.ws.service.delay.IDelayService;
 import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
@@ -40,47 +38,30 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExportEsidocServiceImpl implements IExportEsidocService {
 
 
-    @Autowired
-    @Qualifier("uaiToUseSelector")
-    Function<String, String> uaiToUseSelector;
+    private final EsidocProperties esidocProperties;
+    private final Environment environment;
+    private final ILdapDao ldapDao;
+    private final IExportService exportService;
+    private final IMappingService mappingService;
+    private final ConfProperties confProperties;
+    private final IStructureRegroupeeService structureRegroupeeService;
+    private final IDelayService delayService;
 
-    @Autowired
-    EsidocProperties esidocProperties;
-
-    @Autowired
-    private Environment environment;
-
-    @Autowired
-    ILdapDao ldapDao;
-
-    @Autowired
-    IExportService exportService;
-
-    @Autowired
-    IMappingService mappingService;
-
-    @Autowired
-    ConfProperties confProperties;
-
-    @Autowired
-    IStructureRegroupeeService structureRegroupeeService;
-
-    @Autowired
-    IDelayService delayService;
 
     public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException {
 
         List<String> uais = structureRegroupeeService.getUaisRegroupement(uai);
+        String parentUai = structureRegroupeeService.getParentUai(uai);
 
-        if (!delayService.canSendRequestToEsidocApi(uai)) {
-            throw new AlreadyExportedException("All export were already done", uai);
+        if (!delayService.canSendRequestToEsidocApi(parentUai)) {
+            throw new AlreadyExportedException("All export were already done", parentUai);
         }
 
 
@@ -105,13 +86,12 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
         try {
             String xml = mappingService.getValidatedXml(allEmprunteurs);
-            exportService.exportMappingToUai(uai, xml);
+            exportService.exportMappingToUai(parentUai, xml);
         } catch (IOException | SAXException e) {
-            throw new MappingValidationException("Error when trying to validate XML for " + uai);
+            throw new MappingValidationException("Error when trying to validate XML for " + parentUai);
         }
 
-
-        delayService.applyDelayToUai(uai);
-        return new ExportEsidocPositiveResponse(uai);
+        delayService.applyDelayToUai(parentUai);
+        return new ExportEsidocPositiveResponse(parentUai);
     }
 }

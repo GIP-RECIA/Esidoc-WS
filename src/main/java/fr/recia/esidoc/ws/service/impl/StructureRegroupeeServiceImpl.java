@@ -17,28 +17,43 @@ package fr.recia.esidoc.ws.service.impl;
 
 import fr.recia.esidoc.ws.config.bean.ConfProperties;
 import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StructureRegroupeeServiceImpl implements IStructureRegroupeeService {
 
-    @Autowired
-    ConfProperties confProperties;
+    private final ConfProperties confProperties;
 
     @Override
-    public List<String> getUaisRegroupement(String uai) {
-        for(List<String> stringList : confProperties.getStructuresRegroupees()){
-            if(stringList.contains(uai)){
-                return stringList;
+    public List<String> getUaisRegroupement(final String uai) {
+        final String parentUai = getParentUai(uai);
+        final List<String> children = confProperties.getStructuresRegroupees().get(parentUai);
+        if (children == null) {
+            return List.of(uai);
+        }
+        final List<String> uais = new ArrayList<>();
+        uais.add(parentUai);
+        uais.addAll(children);
+        return uais;
+    }
+
+    @Override
+    public String getParentUai(final String uai) {
+        if (confProperties.getStructuresRegroupees().containsKey(uai)) {
+            return uai;
+        }
+        for (final Map.Entry<String, List<String>> entry : confProperties.getStructuresRegroupees().entrySet()) {
+            if (entry.getValue().contains(uai)) {
+                return entry.getKey();
             }
         }
-        return List.of(uai);
+        return uai;
     }
 
 }

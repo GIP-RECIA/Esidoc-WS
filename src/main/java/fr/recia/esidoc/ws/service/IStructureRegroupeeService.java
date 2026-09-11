@@ -21,4 +21,6 @@ public interface IStructureRegroupeeService {
 
     public List<String> getUaisRegroupement(String uai);
 
+    String getParentUai(String uai);
+
 }

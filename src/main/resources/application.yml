@@ -65,9 +65,10 @@ app:
     export-annuaire-uri: "placeholder/${app.esidoc.editeur}/{rne}"
     rne-dev-qualif: ""
   conf:
-    structures-regroupees:
-#      - - "placeholderA"
-#        - "placeholderB"
+    structures-regroupees: {}
+  #      placeholderA:
+  #        - "placeholderB"
+  #        - "placeholderC"
   debug:
     debug-mode: none # none, profiles
     debug-uai: "*********"
