@@ -20,8 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ConfigurationProperties(prefix = "app.conf")
 @Data
@@ -29,7 +30,7 @@ import java.util.List;
 @Slf4j
 public class ConfProperties {
 
-   List<List<String>> structuresRegroupees = new ArrayList<>();
+    Map<String, List<String>> structuresRegroupees = new HashMap<>();
 
     @Override
     public String toString() {
