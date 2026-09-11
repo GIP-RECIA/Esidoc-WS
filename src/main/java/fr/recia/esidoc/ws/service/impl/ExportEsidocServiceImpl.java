@@ -34,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
-
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -80,21 +79,20 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
         List<String> uais = structureRegroupeeService.getUaisRegroupement(uai);
 
-        if(!delayService.canSendRequestToEsidocApi(uai)){
+        if (!delayService.canSendRequestToEsidocApi(uai)) {
             throw new AlreadyExportedException("All export were already done", uai);
         }
 
 
         List<Emprunteurs> allEmprunteurs = new ArrayList<>();
 
-        for(String uaiIterated : uais){
+        for (String uaiIterated : uais) {
             // try catch in the for so exceptions for some uai does not prevent other to be exported
             try {
                 List<Emprunteurs> emprunteursList;
-                emprunteursList = mappingService.getEmprunteurs(uai);
+                emprunteursList = mappingService.getEmprunteurs(uaiIterated);
                 allEmprunteurs.addAll(emprunteursList);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 if (e instanceof MappingValidationException) {
                     log.error("Mapping exception when trying to export to {}", uaiIterated, e);
                 } else if (e instanceof ExportAnnuaireException) {
@@ -111,7 +109,6 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
         } catch (IOException | SAXException e) {
             throw new MappingValidationException("Error when trying to validate XML for " + uai);
         }
-
 
 
         delayService.applyDelayToUai(uai);

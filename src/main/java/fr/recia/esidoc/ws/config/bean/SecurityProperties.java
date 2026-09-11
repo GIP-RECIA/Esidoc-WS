@@ -16,10 +16,11 @@
 package fr.recia.esidoc.ws.config.bean;
 
 
-import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.List;
 
 @Data
 @Slf4j
@@ -27,16 +28,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SecurityProperties {
 
     String apiKey;
-
-    @PostConstruct
-    void init(){
-        log.info(this.toString());
-    }
-
-    @Override
-    public String toString() {
-        return "SecurityProperties{" +
-                "apiKey='" + apiKey + '\'' +
-                '}';
-    }
+    List<String> authorizedIpAccess;
 }

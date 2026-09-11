@@ -15,9 +15,11 @@
  */
 package fr.recia.esidoc.ws.config.security;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import jakarta.servlet.FilterChain;
@@ -28,23 +30,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class AuthenticationFilter extends GenericFilterBean {
+
+    private final AuthenticationService authenticationService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
         try {
-            log.debug("doFilter - call from request {}", ((HttpServletRequest)request).getRequestURI());
             if (((HttpServletRequest)request).getRequestURI().contains("/api/")) {
-                log.debug("doFilter - try to authenticate");
-                Authentication authentication = AuthenticationService.getAuthentication((HttpServletRequest) request);
+                Authentication authentication = authenticationService.getAuthentication((HttpServletRequest) request);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("doFilter - authentication is done");
             }
         } catch (Exception ex) {
-            log.debug("doFilter - authentication failed with exception", ex);
+            log.debug("Authentification failed", ex);
         }
-        log.debug("doFilter - continue filterChain");
         filterChain.doFilter(request, response);
     }
 }
