@@ -17,13 +17,15 @@ package fr.recia.esidoc.ws.config;
 
 import fr.recia.esidoc.ws.config.bean.SecurityProperties;
 import fr.recia.esidoc.ws.config.security.AuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -37,16 +39,16 @@ public class SecurityConfig {
     private final SecurityProperties securityProperties;
     private final AuthenticationFilter authenticationFilter;
 
-    public SecurityConfig(SecurityProperties securityProperties, AuthenticationFilter authenticationFilter) {
+    public SecurityConfig(final SecurityProperties securityProperties, final AuthenticationFilter authenticationFilter) {
         this.securityProperties = securityProperties;
         this.authenticationFilter = authenticationFilter;
     }
 
-    static String buildAccessExpression(List<String> authorizedIps) {
-        StringBuilder hasIpAddress = new StringBuilder(
+    static String buildAccessExpression(final List<String> authorizedIps) {
+        final StringBuilder hasIpAddress = new StringBuilder(
                 "hasIpAddress('127.0.0.1') or hasIpAddress('::1')"
         );
-        for (String ip : authorizedIps) {
+        for (final String ip : authorizedIps) {
             hasIpAddress.append(" or hasIpAddress('").append(ip).append("')");
         }
 
@@ -54,23 +56,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
-    SecurityFilterChain adminChain(HttpSecurity http) {
-        String accessExpression = buildAccessExpression(this.securityProperties.getAuthorizedIpAccess());
-
-        http.securityMatcher("/api/**")
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().access(new WebExpressionAuthorizationManager(accessExpression)));
-        return http.build();
+    AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            log.warn("Access denied for IP '{}' on '{}'", request.getRemoteAddr(), request.getRequestURI());
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        };
     }
 
     @Bean
-    @Order(2)
-    SecurityFilterChain defaultChain(HttpSecurity http) {
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/health-check").permitAll()
-                .anyRequest().permitAll());
+    SecurityFilterChain securityFilterChain(final HttpSecurity http) {
+        final String accessExpression = buildAccessExpression(this.securityProperties.getAuthorizedIpAccess());
+
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/health-check").permitAll()
+                        .requestMatchers("/api/**").access(new WebExpressionAuthorizationManager(accessExpression))
+                        .anyRequest().denyAll())
+                .exceptionHandling(handling -> handling.accessDeniedHandler(accessDeniedHandler()));
+
         return http.build();
     }
 }
