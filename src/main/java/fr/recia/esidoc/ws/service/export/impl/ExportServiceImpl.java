@@ -21,15 +21,9 @@ import fr.recia.esidoc.ws.exception.ExportAnnuaireException;
 import fr.recia.esidoc.ws.model.EsidocError;
 import fr.recia.esidoc.ws.service.auth.token.ServiceToken;
 import fr.recia.esidoc.ws.service.export.IExportService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -41,18 +35,13 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExportServiceImpl implements IExportService {
 
     private static final String RNE_SLUG = "{rne}";
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    EsidocProperties esidocProperties;
-
-    @Autowired
-    ServiceToken serviceToken;
+    private final RestTemplate restTemplate;
+    private final EsidocProperties esidocProperties;
+    private final ServiceToken serviceToken;
 
     @Override
     public String exportMappingToUai(String uai, String xml){
@@ -63,7 +52,7 @@ public class ExportServiceImpl implements IExportService {
             HttpHeaders requestHeaders = new HttpHeaders();
             requestHeaders.setContentType(new MediaType(MediaType.APPLICATION_XML, StandardCharsets.UTF_8));
             requestHeaders.setBearerAuth(serviceToken.getToken());
-            HttpEntity<String> requestEntity = new HttpEntity<String>(xml, requestHeaders);
+            HttpEntity<String> requestEntity = new HttpEntity<>(xml, requestHeaders);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             if(response.hasBody()){

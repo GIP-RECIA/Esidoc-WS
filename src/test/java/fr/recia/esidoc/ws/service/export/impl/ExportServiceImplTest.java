@@ -23,7 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
@@ -53,7 +53,9 @@ class ExportServiceImplTest {
     @Mock
     ServiceToken serviceToken;
 
-    @InjectMocks
+    @Captor
+    ArgumentCaptor<HttpEntity<String>> captor;
+
     ExportServiceImpl exportService;
 
     @BeforeEach
@@ -61,7 +63,7 @@ class ExportServiceImplTest {
         final EsidocProperties esidocProperties = new EsidocProperties();
         esidocProperties.setEditeur("editeur");
         esidocProperties.setExportAnnuaireUri("https://esidoc.example/{rne}");
-        exportService.esidocProperties = esidocProperties;
+        exportService = new ExportServiceImpl(restTemplate, esidocProperties, serviceToken);
     }
 
     @Test
@@ -74,7 +76,6 @@ class ExportServiceImplTest {
 
         assertThat(result).isEqualTo("<result/>");
 
-        final ArgumentCaptor<HttpEntity> captor = ArgumentCaptor.forClass(HttpEntity.class);
         verify(restTemplate).exchange(eq("https://esidoc.example/uai1"), eq(HttpMethod.POST), captor.capture(), eq(String.class));
         assertThat(captor.getValue().getBody()).isEqualTo("<xml/>");
         assertThat(captor.getValue().getHeaders().get(HttpHeaders.AUTHORIZATION)).containsExactly("Bearer token123");
