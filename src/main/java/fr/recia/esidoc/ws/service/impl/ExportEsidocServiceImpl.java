@@ -31,13 +31,13 @@ import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -46,7 +46,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
 
 
     private final EsidocProperties esidocProperties;
-    private final Environment environment;
+    private final Function<String, String> uaiToUseSelector;
     private final ILdapDao ldapDao;
     private final IExportService exportService;
     private final IMappingService mappingService;
@@ -58,7 +58,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
     public ExportEsidocPositiveResponse exportAnnuaireForUai(String uai) throws GlobalExportAnnuaireException {
 
         List<String> uais = structureRegroupeeService.getUaisRegroupement(uai);
-        String parentUai = structureRegroupeeService.getParentUai(uai);
+        String parentUai = uaiToUseSelector.apply(structureRegroupeeService.getParentUai(uai));
 
         if (!delayService.canSendRequestToEsidocApi(parentUai)) {
             throw new AlreadyExportedException("All export were already done", parentUai);
@@ -73,14 +73,12 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
                 List<Emprunteurs> emprunteursList;
                 emprunteursList = mappingService.getEmprunteurs(uaiIterated);
                 allEmprunteurs.addAll(emprunteursList);
+            } catch (MappingValidationException e) {
+                log.error("Mapping exception when trying to export to {}", uaiIterated, e);
+            } catch (ExportAnnuaireException e) {
+                log.error("Export exception when trying to export to {}", uaiIterated, e);
             } catch (Exception e) {
-                if (e instanceof MappingValidationException) {
-                    log.error("Mapping exception when trying to export to {}", uaiIterated, e);
-                } else if (e instanceof ExportAnnuaireException) {
-                    log.error("Export exception when trying to export to {}", uaiIterated, e);
-                } else {
-                    log.error("Unexpected exception", e);
-                }
+                log.error("Unexpected exception", e);
             }
         }
 
@@ -88,7 +86,7 @@ public class ExportEsidocServiceImpl implements IExportEsidocService {
             String xml = mappingService.getValidatedXml(allEmprunteurs);
             exportService.exportMappingToUai(parentUai, xml);
         } catch (IOException | SAXException e) {
-            throw new MappingValidationException("Error when trying to validate XML for " + parentUai);
+            throw new MappingValidationException("Error when trying to validate XML for " + parentUai, e);
         }
 
         delayService.applyDelayToUai(parentUai);

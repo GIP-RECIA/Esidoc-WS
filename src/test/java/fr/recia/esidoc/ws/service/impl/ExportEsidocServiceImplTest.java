@@ -21,6 +21,7 @@ import fr.recia.esidoc.ws.service.IStructureRegroupeeService;
 import fr.recia.esidoc.ws.service.delay.IDelayService;
 import fr.recia.esidoc.ws.service.export.IExportService;
 import fr.recia.esidoc.ws.service.mapping.IMappingService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,9 +29,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,8 +52,16 @@ class ExportEsidocServiceImplTest {
     @Mock
     IExportService exportService;
 
+    @Mock
+    Function<String, String> uaiToUseSelector;
+
     @InjectMocks
     ExportEsidocServiceImpl service;
+
+    @BeforeEach
+    void setUp() {
+        when(uaiToUseSelector.apply(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+    }
 
     @Test
     void shouldExportUnderTheParentUaiWhenCalledWithAChildUai() throws Exception {
@@ -94,5 +105,19 @@ class ExportEsidocServiceImplTest {
         verify(mappingService).getValidatedXml(List.of(solo));
         verify(exportService).exportMappingToUai("uaiSolo", "<xml/>");
         verify(delayService).applyDelayToUai("uaiSolo");
+    }
+
+    @Test
+    void shouldUseTheSelectorOutputAsTheExportTarget() throws Exception {
+        when(structureRegroupeeService.getUaisRegroupement("uaiReal")).thenReturn(List.of("uaiReal"));
+        when(structureRegroupeeService.getParentUai("uaiReal")).thenReturn("uaiReal");
+        when(uaiToUseSelector.apply("uaiReal")).thenReturn("uaiDebug");
+        when(delayService.canSendRequestToEsidocApi("uaiDebug")).thenReturn(true);
+        when(mappingService.getEmprunteurs("uaiReal")).thenReturn(List.of());
+        when(mappingService.getValidatedXml(anyList())).thenReturn("<xml/>");
+
+        service.exportAnnuaireForUai("uaiReal");
+
+        verify(exportService).exportMappingToUai("uaiDebug", "<xml/>");
     }
 }
