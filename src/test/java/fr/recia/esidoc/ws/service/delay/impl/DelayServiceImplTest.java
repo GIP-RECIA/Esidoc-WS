@@ -20,7 +20,6 @@ import fr.recia.esidoc.ws.config.bean.RedisProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,26 +39,28 @@ class DelayServiceImplTest {
     @Mock
     ValueOperations<String, String> valueOperations;
 
-    @InjectMocks
+    RedisProperties redisProperties;
+    DelayProperties delayProperties;
     DelayServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        final DelayProperties delayProperties = new DelayProperties();
+        delayProperties = new DelayProperties();
         delayProperties.setUseDelay(true);
         delayProperties.setDurationInMinutes(30);
-        service.delayProperties = delayProperties;
 
-        final RedisProperties redisProperties = new RedisProperties();
+        redisProperties = new RedisProperties();
         redisProperties.setMappingPrefix("esidoc");
-        service.redisProperties = redisProperties;
+        service = new DelayServiceImpl(delayProperties, redisProperties, redisTemplate);
     }
 
     @Test
     void shouldAllowRequestWhenDelayIsDisabled() {
-        service.delayProperties.setUseDelay(false);
+        final DelayProperties disabledDelayProperties = new DelayProperties();
+        disabledDelayProperties.setUseDelay(false);
+        final DelayServiceImpl disabledService = new DelayServiceImpl(disabledDelayProperties, redisProperties, redisTemplate);
 
-        final boolean result = service.canSendRequestToEsidocApi("uai1");
+        final boolean result = disabledService.canSendRequestToEsidocApi("uai1");
 
         assertThat(result).isTrue();
         verifyNoInteractions(redisTemplate);
@@ -87,9 +88,10 @@ class DelayServiceImplTest {
 
     @Test
     void shouldNotWriteToRedisWhenDelayIsDisabled() {
-        service.delayProperties.setUseDelay(false);
-
-        service.applyDelayToUai("uai1");
+        final DelayProperties disabledDelayProperties = new DelayProperties();
+        disabledDelayProperties.setUseDelay(false);
+        final DelayServiceImpl disabledService = new DelayServiceImpl(disabledDelayProperties, redisProperties, redisTemplate);
+        disabledService.applyDelayToUai("uai1");
 
         verifyNoInteractions(redisTemplate);
     }
