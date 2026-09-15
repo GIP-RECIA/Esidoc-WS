@@ -15,18 +15,26 @@
  */
 package fr.recia.esidoc.ws.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 public class TokenResponsePayload {
-    String access_token;
-    int expires_in;
-    String token_type;
+
+    @JsonProperty("access_token")
+    String accessToken;
+
+    @JsonProperty("expires_in")
+    int expiresIn;
+
+    @JsonProperty("token_type")
+    String tokenType;
 
     @Override
     public String toString(){
-        return String.format("Token response payload: token %s, expire in %s, token type %s", access_token, expires_in, token_type);
+        return String.format("Token response payload: token %s, expire in %s, token type %s", accessToken, expiresIn, tokenType);
     }
 }
+

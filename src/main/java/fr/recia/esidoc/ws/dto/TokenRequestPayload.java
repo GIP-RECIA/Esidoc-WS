@@ -15,6 +15,7 @@
  */
 package fr.recia.esidoc.ws.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TokenRequestPayload {
-    String grant_type;
-    String client_id;
-    String client_secret;
+    @JsonProperty("grant_type")
+    String grantType;
+    @JsonProperty("client_id")
+    String clientId;
+    @JsonProperty("client_secret")
+    String clientSecret;
 }
