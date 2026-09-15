@@ -32,6 +32,7 @@ class StructureRegroupeeServiceImplTest {
     void setUp() {
         final ConfProperties confProperties = new ConfProperties();
         confProperties.setStructuresRegroupees(Map.of("A", List.of("B", "C")));
+        confProperties.setStructuresPartagees(List.of(List.of("E", "F", "G")));
         service = new StructureRegroupeeServiceImpl(confProperties);
     }
 
@@ -60,5 +61,19 @@ class StructureRegroupeeServiceImplTest {
     @Test
     void shouldReturnOnlyItselfWhenNotGrouped() {
         assertThat(service.getUaisRegroupement("D")).containsExactly("D");
+    }
+
+    @Test
+    void shouldReturnItselfAsExportTargetForSharedGroupMember() {
+        assertThat(service.getParentUai("E")).isEqualTo("E");
+        assertThat(service.getParentUai("F")).isEqualTo("F");
+        assertThat(service.getParentUai("G")).isEqualTo("G");
+    }
+
+    @Test
+    void shouldReturnFullSharedGroupRegardlessOfWhichUaiIsCalled() {
+        assertThat(service.getUaisRegroupement("E")).containsExactlyInAnyOrder("E", "F", "G");
+        assertThat(service.getUaisRegroupement("F")).containsExactlyInAnyOrder("E", "F", "G");
+        assertThat(service.getUaisRegroupement("G")).containsExactlyInAnyOrder("E", "F", "G");
     }
 }

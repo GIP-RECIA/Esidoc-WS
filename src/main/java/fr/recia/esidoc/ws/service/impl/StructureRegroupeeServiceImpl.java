@@ -32,6 +32,11 @@ public class StructureRegroupeeServiceImpl implements IStructureRegroupeeService
 
     @Override
     public List<String> getUaisRegroupement(final String uai) {
+        final List<String> groupePartage = findStructuresPartagees(uai);
+        if (!groupePartage.isEmpty()) {
+            return groupePartage;
+        }
+
         final String parentUai = getParentUai(uai);
         final List<String> children = confProperties.getStructuresRegroupees().get(parentUai);
         if (children == null) {
@@ -45,6 +50,9 @@ public class StructureRegroupeeServiceImpl implements IStructureRegroupeeService
 
     @Override
     public String getParentUai(final String uai) {
+        if (!findStructuresPartagees(uai).isEmpty()) {
+            return uai;
+        }
         if (confProperties.getStructuresRegroupees().containsKey(uai)) {
             return uai;
         }
@@ -54,6 +62,15 @@ public class StructureRegroupeeServiceImpl implements IStructureRegroupeeService
             }
         }
         return uai;
+    }
+
+    private List<String> findStructuresPartagees(final String uai) {
+        for (final List<String> groupe : confProperties.getStructuresPartagees()) {
+            if (groupe.contains(uai)) {
+                return groupe;
+            }
+        }
+        return List.of();
     }
 
 }
