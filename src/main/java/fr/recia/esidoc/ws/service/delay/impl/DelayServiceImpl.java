@@ -31,16 +31,21 @@ import java.util.Objects;
 @Service
 public class DelayServiceImpl implements IDelayService {
 
+    private final DelayProperties delayProperties;
+    private final RedisProperties redisProperties;
+    private final RedisTemplate<String, String> redisTemplate;
+
 
     @Autowired
-    DelayProperties delayProperties;
-
-    @Autowired
-    RedisProperties redisProperties;
-
-    @Autowired
-    @Qualifier("customRedisTemplate")
-    private RedisTemplate<String, String> redisTemplate;
+    public  DelayServiceImpl(
+            DelayProperties delayProperties,
+            RedisProperties redisProperties,
+            @Qualifier("customRedisTemplate") RedisTemplate<String, String> redisTemplate
+    ){
+                this.delayProperties = delayProperties;
+                this.redisProperties = redisProperties;
+                this.redisTemplate = redisTemplate;
+    }
 
     @Override
     public boolean canSendRequestToEsidocApi(String uai) {

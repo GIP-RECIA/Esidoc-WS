@@ -16,51 +16,37 @@
 package fr.recia.esidoc.ws.service.util;
 
 import fr.recia.esidoc.ws.config.bean.MappingProperties;
+import fr.recia.esidoc.ws.config.bean.MappingProperties.MappingRanked;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MappingStatusUtils {
 
-    @Autowired
-    MappingProperties mappingProperties;
+    private final MappingProperties mappingProperties;
 
     @Nullable
-    public String getMainStatusMM(List<String> statusSdetList){
-        statusSdetList = new ArrayList<>(statusSdetList);
-        if(statusSdetList.isEmpty()){
-            return null;
-        }
-
-        String statusMM = mappingProperties.getAutreBcdiStatut();
-        int bestRank = Integer.MAX_VALUE;
-        for(String statusSdet: statusSdetList){
-            int currentRank = getSdetRank(statusSdet);
-            if(currentRank < bestRank){
-                bestRank = currentRank;
-                statusMM = convertSdetToStatusMM(statusSdet);
-            }
-        }
-        return statusMM;
+    public String getMainStatusMM(List<String> statusSdetList) {
+        return statusSdetList.stream()
+                .min(Comparator.comparingInt(this::rankOf))
+                .map(this::statusOf)
+                .orElse(null);
     }
 
-    private String convertSdetToStatusMM(String statusSdet){
-        if(mappingProperties.getSdetbcdi().containsKey(statusSdet)){
-            return mappingProperties.getSdetbcdi().get(statusSdet).getMapping();
-        }
-        return mappingProperties.getAutreBcdiStatut();
+    private int rankOf(String statusSdet) {
+        MappingRanked mapping = mappingProperties.getSdetbcdi().get(statusSdet);
+        return mapping != null ? mapping.getRank() : Integer.MAX_VALUE;
     }
 
-    private int getSdetRank(String statusSdet){
-        if(mappingProperties.getSdetbcdi().containsKey(statusSdet)){
-            return mappingProperties.getSdetbcdi().get(statusSdet).getRank();
-        }
-        return mappingProperties.getSdetbcdi().size()+1;
+    private String statusOf(String statusSdet) {
+        MappingRanked mapping = mappingProperties.getSdetbcdi().get(statusSdet);
+        return mapping != null ? mapping.getMapping() : mappingProperties.getAutreBcdiStatut();
     }
 }

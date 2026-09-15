@@ -21,8 +21,8 @@ import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
 import fr.recia.esidoc.ws.service.bean.impl.ExtractOpaqueIdImpl;
 import fr.recia.esidoc.ws.service.bean.impl.ExtractUIDFromDNImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -30,7 +30,6 @@ import org.springframework.core.env.Profiles;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
-import org.springframework.web.context.annotation.RequestScope;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,44 +38,31 @@ import java.util.function.Function;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class EsidocWSConfiguration {
 
-    @Autowired
-    private LDAPProperties ldapProperties;
-
-    @Autowired
-    private DebugProperties debugProperties;
-
-    @Autowired
-    private Environment environment;
+    private final LDAPProperties ldapProperties;
+    private final DebugProperties debugProperties;
+    private final Environment environment;
 
 
     @Bean(name = "uaiToUseSelector")
-    public Function<String, String> uaiToUseSelector(){
-        switch (debugProperties.getDebugMode()){
-            case PROFILES -> {
-                Profiles profiles = Profiles.of(
-                    String.join(" | ", debugProperties.getProfiles())
-                );
-                boolean profilesMatch = environment.acceptsProfiles(profiles);
-                //if true return debug value, if false return true value;
-                if(profilesMatch){
-                    log.debug("uaiToUseSelector returned is _ -> debugProperties.getDebugUai()");
-                    return _ -> debugProperties.getDebugUai();
-                }else{
-                    log.debug("uaiToUseSelector returned is x -> x");
-                    return x -> x;
-                }
-            }
-            // also none
-            case null, default -> {
-                log.debug("uaiToUseSelector returned is x -> x");
-                return x -> x;
-            }
-
+    public Function<String, String> uaiToUseSelector() {
+        if (shouldUseDebugUai()) {
+            log.debug("uaiToUseSelector returned is _ -> debugProperties.getDebugUai()");
+            return _ -> debugProperties.getDebugUai();
         }
+        log.debug("uaiToUseSelector returned is x -> x");
+        return Function.identity();
     }
 
+    private boolean shouldUseDebugUai() {
+        if (debugProperties.getDebugMode() != DebugProperties.DebugMode.PROFILES) {
+            return false;
+        }
+        Profiles profiles = Profiles.of(String.join(" | ", debugProperties.getProfiles()));
+        return environment.acceptsProfiles(profiles);
+    }
 
     @Bean
     public IExtractOpaqueId opaqueIdExtractor() {
@@ -103,7 +89,7 @@ public class EsidocWSConfiguration {
     }
 
     @Bean
-    public LdapTemplate ldapTemplate() throws Exception{
+    public LdapTemplate ldapTemplate() {
         final LdapTemplate ldapTemplate = new LdapTemplate();
         ldapTemplate.setContextSource(contextSource());
         ldapTemplate.setDefaultCountLimit(ldapProperties.getCountLimit());
@@ -117,7 +103,7 @@ public class EsidocWSConfiguration {
         try {
             return new ClassPathResource("xsd/Import.xsd").getFile();
         } catch (Exception e) {
-            throw new IllegalStateException("Le fichier xsd/Import.xsd n'a pas été trouvé.");
+            throw new IllegalStateException("Le fichier xsd/Import.xsd n'a pas été trouvé.", e);
         }
     }
 }

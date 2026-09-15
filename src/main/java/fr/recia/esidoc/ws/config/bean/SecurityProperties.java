@@ -24,7 +24,7 @@ import java.util.List;
 
 @Data
 @Slf4j
-@ConfigurationProperties(prefix = "spring.security.apikey")
+@ConfigurationProperties(prefix = "spring.security")
 public class SecurityProperties {
 
     String apiKey;

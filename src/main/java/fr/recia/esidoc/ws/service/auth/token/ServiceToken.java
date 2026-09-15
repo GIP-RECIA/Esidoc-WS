@@ -16,20 +16,15 @@
 package fr.recia.esidoc.ws.service.auth.token;
 
 
-
 import fr.recia.esidoc.ws.config.bean.OAuth2Properties;
 import fr.recia.esidoc.ws.dto.TokenRequestPayload;
 import fr.recia.esidoc.ws.dto.TokenResponsePayload;
 import fr.recia.esidoc.ws.exception.TokenFetchFailedException;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -43,13 +38,11 @@ import java.util.Objects;
 @Service
 @Slf4j
 @Scope("singleton")
+@RequiredArgsConstructor
 public class ServiceToken {
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private OAuth2Properties oAuth2Properties;
+    private final RestTemplate restTemplate;
+    private final OAuth2Properties oAuth2Properties;
 
     TokenHolder tokenHolder = null;
 
@@ -84,8 +77,8 @@ public class ServiceToken {
             TokenResponsePayload responsePayload = response.getBody();
             assert responsePayload != null;
             return new TokenHolder(
-                    responsePayload.getAccess_token(),
-                    Instant.now().plusSeconds((long) (responsePayload.getExpires_in()*0.95f))
+                    responsePayload.getAccessToken(),
+                    Instant.now().plusSeconds((long) (responsePayload.getExpiresIn()*0.95f))
             );
         } catch (RestClientException | HttpMessageNotReadableException e) {
             throw new TokenFetchFailedException(e.getMessage());

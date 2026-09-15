@@ -20,6 +20,8 @@ spring:
 
 
   security:
+    api-key: ""
+    authorized-ip-access: []
     oauth2:
       client:
         registration:
@@ -27,8 +29,6 @@ spring:
           client-id: ""
           client-secret: ""
           oauth2TokenUri: ""
-    apikey:
-      api-key: ""
 app:
   ldap:
     url:
@@ -69,6 +69,8 @@ app:
   #      placeholderA:
   #        - "placeholderB"
   #        - "placeholderC"
+    structures-partagees: []
+  #  - ["placeholderA", "placeholderB", "placeholderC"]
   debug:
     debug-mode: none # none, profiles
     debug-uai: "*********"

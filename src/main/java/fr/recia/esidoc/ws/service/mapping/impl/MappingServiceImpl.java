@@ -37,21 +37,21 @@ import java.util.List;
 @Service
 public class MappingServiceImpl implements IMappingService {
 
-    @Autowired @Qualifier("importXSD")
-    private File importXSD;
-
-    private XmlValidatorImpl xmlValidator;
-
-    @PostConstruct
-    private void setUp() throws SAXException {
-        xmlValidator = new XmlValidatorImpl(importXSD);
-    }
+    private final XmlValidatorImpl xmlValidator;
+    private final ILdapDao ldapDao;
 
     @Autowired
-    ILdapDao ldapDao;
+    public MappingServiceImpl(
+            ILdapDao ldapDao,
+            @Qualifier("importXSD") File importXSD
+    ) throws SAXException {
+        this.ldapDao = ldapDao;
+        this.xmlValidator = new XmlValidatorImpl(importXSD);
+    }
 
     @Override
     public List<Emprunteurs> getEmprunteurs(String uai) {
+
         return ldapDao.findAllEmprunteurs(uai);
     }
 
@@ -65,13 +65,13 @@ public class MappingServiceImpl implements IMappingService {
 
         XmlMapper mapper = new XmlMapper();
 
-        ObjectWriter objectWriter= mapper.writerWithDefaultPrettyPrinter();
-        String xmlBody =  objectWriter.writeValueAsString(fichesXml);
+        ObjectWriter objectWriter = mapper.writerWithDefaultPrettyPrinter();
+        String xmlBody = objectWriter.writeValueAsString(fichesXml);
         String xml =
                 "<?xml version=\"1.0\" encoding=\"windows-1252\"?>\r\n"
                         + xmlBody;
         log.trace(xml);
-            xmlValidator.validate(xml);
+        xmlValidator.validate(xml);
         return xml;
     }
 }
