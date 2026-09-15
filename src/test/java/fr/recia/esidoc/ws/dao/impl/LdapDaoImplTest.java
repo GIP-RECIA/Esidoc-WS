@@ -32,7 +32,6 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQuery;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -63,7 +62,7 @@ class LdapDaoImplTest {
     LdapDaoImpl dao;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         final Filters filters = new Filters();
         filters.setEmprunteurs("(uid=%s)");
         filters.setParents("(uid=%s)");
@@ -77,8 +76,9 @@ class LdapDaoImplTest {
         ldapProperties.setFilters(filters);
 
         dao = new LdapDaoImpl(ldapTemplate, ldapProperties, extractOpaqueId, mappingStatusUtils,
-                mappingProperties, new HashMap<>(), extractUIDFromDN);
+                mappingProperties, extractUIDFromDN);
     }
+
     @Test
     void shouldReturnFirstSirenFound() {
         when(ldapTemplate.search(any(LdapQuery.class), isA(EtabAttributesMapper.class))).thenReturn(List.of("siren123"));

@@ -20,16 +20,13 @@ import fr.recia.esidoc.ws.config.bean.MappingProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.Parent;
-import fr.recia.esidoc.ws.service.bean.IExtractEntEleveGroup;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
 import fr.recia.esidoc.ws.service.bean.impl.ExtractEntEleveGroup;
 import fr.recia.esidoc.ws.service.util.MappingStatusUtils;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.Filter;
@@ -38,7 +35,6 @@ import org.springframework.ldap.query.LdapQuery;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,37 +44,23 @@ import java.util.stream.Collectors;
 
 @Service
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class LdapDaoImpl implements ILdapDao {
 
-    @Autowired
-    private LdapTemplate ldapTemplate;
+    private final LdapTemplate ldapTemplate;
+    private final LDAPProperties ldapProperties;
+    private final IExtractOpaqueId extractOpaqueId;
+    private final MappingStatusUtils mappingStatusUtils;
+    private final MappingProperties mappingProperties;
+    private final IExtractUIDFromDN extractUIDFromDN;
 
-    @Autowired
-    private LDAPProperties ldapProperties;
-
-    @Autowired
-    private IExtractOpaqueId extractOpaqueId;
-
-    @Autowired
-    private MappingStatusUtils mappingStatusUtils;
-
-    @Autowired
-    private MappingProperties mappingProperties;
-
-    private Map<String,Parent> parentMap = new HashMap<>();
-
-    @Autowired
-    private IExtractUIDFromDN extractUIDFromDN;
-
-     private void findAllparents(String uai) {
-        final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getParents(), uai));
-        log.debug("LDAP filter applied : " + filter);
+    private Map<String, Parent> findAllParents(String uai) {
+        Map<String, Parent> parentMap;
+        final Filter filter = new HardcodedFilter(String.format(ldapProperties.getFilters().getParents(), uai));
         ContextMapper<Map.Entry<String, Parent>> mapper = new ParentsAttributesMapper();
         LdapQuery query = LdapQueryBuilder.query()
-            .attributes(LdapAttributes.PARENT_ATTRS.toArray(new String[LdapAttributes.PARENT_ATTRS.size()]))
+                .attributes(LdapAttributes.PARENT_ATTRS.toArray(new String[LdapAttributes.PARENT_ATTRS.size()]))
                 .base(ldapProperties.getPeopleRootDn()).filter(filter);
 
         parentMap =
@@ -89,26 +71,25 @@ public class LdapDaoImpl implements ILdapDao {
                                 Entry::getValue
                         ));
 
-//        return map;
+        return parentMap;
     }
 
     @Override
     public String getSirenForUai(String uai) {
-        final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getValidUai(), uai));
+        final Filter filter = new HardcodedFilter(String.format(ldapProperties.getFilters().getValidUai(), uai));
         LdapQuery query = LdapQueryBuilder.query().countLimit(1)
                 .attributes(LdapAttributes.ETAB_ATTRS.toArray(new String[LdapAttributes.ETAB_ATTRS.size()]))
                 .base(ldapProperties.getStructureRootDn()).filter(filter);
         ContextMapper<String> mapper = new EtabAttributesMapper();
-        List<String> etabs = ldapTemplate.search(query,mapper);
+        List<String> etabs = ldapTemplate.search(query, mapper);
         return etabs.getFirst();
     }
 
     @Override
     public List<Emprunteurs> findAllEmprunteurs(String uai) {
-        findAllparents(uai);
-        final Filter filter= new HardcodedFilter(String.format(ldapProperties.getFilters().getEmprunteurs(), uai));
-        log.debug("LDAP filter applied : " + filter);
-        String siren =  getSirenForUai(uai);
+        Map<String, Parent> parentMap = findAllParents(uai);
+        final Filter filter = new HardcodedFilter(String.format(ldapProperties.getFilters().getEmprunteurs(), uai));
+        String siren = getSirenForUai(uai);
         ContextMapper<Emprunteurs> mapper = new EmprunteursAttributesMapper(
                 extractOpaqueId,
                 mappingStatusUtils,
@@ -116,7 +97,7 @@ public class LdapDaoImpl implements ILdapDao {
                 parentMap,
                 extractUIDFromDN,
                 Pattern.compile(ldapProperties.getAutorizedResponsablePattern()),
-                new ExtractEntEleveGroup(Pattern.compile(String.format(ldapProperties.getEleveGroupePattern(),siren)))
+                new ExtractEntEleveGroup(Pattern.compile(String.format(ldapProperties.getEleveGroupePattern(), siren)))
         );
         LdapQuery query = LdapQueryBuilder.query()
                 .attributes(LdapAttributes.PERSON_ATTRS.toArray(new String[LdapAttributes.PERSON_ATTRS.size()]))
