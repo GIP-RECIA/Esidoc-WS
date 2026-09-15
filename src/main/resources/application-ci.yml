@@ -23,5 +23,4 @@ spring:
   redis:
     namespace: ci
   security:
-    apikey:
       authorized-ip-access: []
