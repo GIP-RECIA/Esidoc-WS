@@ -18,6 +18,7 @@ package fr.recia.esidoc.ws.dao.impl;
 import fr.recia.esidoc.ws.config.bean.LDAPProperties;
 import fr.recia.esidoc.ws.config.bean.MappingProperties;
 import fr.recia.esidoc.ws.dao.ILdapDao;
+import fr.recia.esidoc.ws.exception.EtablissementMissingException;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.model.Parent;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
@@ -82,7 +83,10 @@ public class LdapDaoImpl implements ILdapDao {
                 .base(ldapProperties.getStructureRootDn()).filter(filter);
         ContextMapper<String> mapper = new EtabAttributesMapper();
         List<String> etabs = ldapTemplate.search(query, mapper);
-        return etabs.getFirst();
+        if(!etabs.isEmpty()){
+            return etabs.getFirst();
+        }
+        throw new EtablissementMissingException("UAI :"+ uai );
     }
 
     @Override

@@ -19,6 +19,7 @@ package fr.recia.esidoc.ws.dao.impl;
 import fr.recia.esidoc.ws.config.bean.Filters;
 import fr.recia.esidoc.ws.config.bean.LDAPProperties;
 import fr.recia.esidoc.ws.config.bean.MappingProperties;
+import fr.recia.esidoc.ws.exception.EtablissementMissingException;
 import fr.recia.esidoc.ws.model.Emprunteurs;
 import fr.recia.esidoc.ws.service.bean.IExtractOpaqueId;
 import fr.recia.esidoc.ws.service.bean.IExtractUIDFromDN;
@@ -33,7 +34,6 @@ import org.springframework.ldap.query.LdapQuery;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -93,7 +93,7 @@ class LdapDaoImplTest {
         when(ldapTemplate.search(any(LdapQuery.class), isA(EtabAttributesMapper.class))).thenReturn(List.of());
 
         assertThatThrownBy(() -> dao.getSirenForUai("uaiInconnu"))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(EtablissementMissingException.class);
     }
 
     @Test
@@ -119,6 +119,6 @@ class LdapDaoImplTest {
         when(ldapTemplate.search(any(LdapQuery.class), isA(EtabAttributesMapper.class))).thenReturn(List.of());
 
         assertThatThrownBy(() -> dao.findAllEmprunteurs("uaiInconnu"))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(EtablissementMissingException.class);
     }
 }
